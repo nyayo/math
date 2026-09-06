@@ -17,8 +17,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 const schema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   content: z.string().min(10, 'Content must be at least 10 characters'),
-  order: z.coerce.number().min(1, 'Order must be at least 1'),
-  duration_minutes: z.coerce.number().min(1, 'Duration must be at least 1 minute'),
+  order: z.number().min(1, 'Order must be at least 1'),
+  duration_minutes: z.number().min(1, 'Duration must be at least 1 minute'),
   topic_id: z.string().min(1, 'Please select a topic'),
 });
 
@@ -33,7 +33,7 @@ export default function AuthoringLesson() {
   const topics = topicsQuery.data?.results ?? [];
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as never,
     defaultValues: { title: '', content: '', order: 1, duration_minutes: 10, topic_id: preselectedTopic },
   });
   const topicId = watch('topic_id');

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Bell, CheckCheck, BellOff, Trash2, Check, AlertTriangle, Trophy, GraduationCap, Sparkles } from 'lucide-react';
 import { useNotifications } from '@/hooks/useTeacher';
+import type { NotificationItem } from '@/types/teacher';
 import { AppShell } from '@/components/layout/AppShell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,11 +19,11 @@ const toneConfig: Record<string, { bg: string; text: string; icon: React.Element
   success: { bg: 'bg-emerald-100 dark:bg-emerald-900/40', text: 'text-emerald-600 dark:text-emerald-300', icon: Trophy },
 };
 
-function groupByDate(items: { id: string; created_at: string }[]) {
+function groupByDate(items: NotificationItem[]) {
   const now = new Date();
-  const today: typeof items = [];
-  const yesterday: typeof items = [];
-  const earlier: typeof items = [];
+  const today: NotificationItem[] = [];
+  const yesterday: NotificationItem[] = [];
+  const earlier: NotificationItem[] = [];
   for (const item of items) {
     const d = new Date(item.created_at);
     const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400_000);
@@ -36,7 +37,7 @@ function groupByDate(items: { id: string; created_at: string }[]) {
 export default function Notifications() {
   const notifQuery = useNotifications();
   const navigate = useNavigate();
-  const [items, setItems] = React.useState<{ id: string; created_at: string; read: boolean; tone: string; title: string; description: string }[]>([]);
+  const [items, setItems] = React.useState<NotificationItem[]>([]);
 
   React.useEffect(() => { if (notifQuery.data) setItems(notifQuery.data); }, [notifQuery.data]);
 

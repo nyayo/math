@@ -33,7 +33,7 @@ export default function TopicDetailTeacher() {
 
   const [editOpen, setEditOpen] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
-  const [form, setForm] = React.useState({ name: '', description: '', level: 'S1', subject: 'Algebra' });
+  const [form, setForm] = React.useState({ name: '', description: '', level: 'S1' as 'S1' | 'S2' | 'S3' | 'S4' | 'S5' | 'S6' | 'University', subject: 'Algebra' as 'Algebra' | 'Geometry' | 'Calculus' | 'Statistics' | 'Trigonometry' | 'Number Theory' });
 
   React.useEffect(() => {
     if (topic) setForm({ name: topic.name, description: topic.description, level: topic.level, subject: topic.subject });
@@ -131,8 +131,8 @@ export default function TopicDetailTeacher() {
             <div><Label htmlFor="t-name">Name</Label><Input id="t-name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="mt-2" /></div>
             <div><Label htmlFor="t-desc">Description</Label><Textarea id="t-desc" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} className="mt-2" /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div><Label htmlFor="t-level">Level</Label><Select value={form.level} onValueChange={(v) => setForm((f) => ({ ...f, level: v }))}><SelectTrigger id="t-level" className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{LEVELS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent></Select></div>
-              <div><Label htmlFor="t-subject">Subject</Label><Select value={form.subject} onValueChange={(v) => setForm((f) => ({ ...f, subject: v }))}><SelectTrigger id="t-subject" className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select></div>
+              <div><Label htmlFor="t-level">Level</Label><Select value={form.level} onValueChange={(v) => setForm((f) => ({ ...f, level: v as typeof f.level }))}><SelectTrigger id="t-level" className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{LEVELS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent></Select></div>
+              <div><Label htmlFor="t-subject">Subject</Label><Select value={form.subject} onValueChange={(v) => setForm((f) => ({ ...f, subject: v as typeof f.subject }))}><SelectTrigger id="t-subject" className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select></div>
             </div>
           </div>
           <DialogFooter>
