@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, ClipboardCheck, Library, Plus, FileText, PencilLine, Trash2, ArrowRight, X } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Library, Plus, FileText, ArrowRight, X } from 'lucide-react';
 import { useContentActivity, useTeacherOverview } from '@/hooks/useTeacher';
 import { AppShell } from '@/components/layout/AppShell';
 import { Card } from '@/components/ui/card';
@@ -12,7 +12,6 @@ import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { formatRelativeTime } from '@/lib/utils';
 
-const actionIcons: Record<string, React.ElementType> = { created: Plus, updated: PencilLine, deleted: Trash2 };
 const typeIcons: Record<string, React.ElementType> = { topic: Library, lesson: BookOpen, quiz: ClipboardCheck, question: FileText };
 const actionTones: Record<string, 'success' | 'brand' | 'danger'> = { created: 'success', updated: 'brand', deleted: 'danger' };
 
@@ -56,7 +55,6 @@ export default function ContentHub() {
          activity.length === 0 ? <p className="text-sm text-ink-500">No recent activity.</p> : (
            <div className="space-y-2">
              {activity.slice(0, 10).map((item, i) => {
-               const ActionIcon = actionIcons[item.action] ?? FileText;
                const TypeIcon = typeIcons[item.item_type] ?? FileText;
                return (
                  <motion.div key={item.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}>

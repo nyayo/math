@@ -2,7 +2,7 @@ import type { Topic, Lesson, Quiz, Question } from '@/types/learning';
 import type { TeacherOverview, TeacherStudent, StudentDetail, ContentActivity, NotificationItem, SearchResult } from '@/types/teacher';
 import { mockTopics } from '@/mocks/topics';
 import { mockLessons } from '@/mocks/lessons';
-import { mockQuizzes, mockQuestions } from '@/mocks/quizzes';
+import { mockQuizzes } from '@/mocks/quizzes';
 import { mockTeacherOverview, mockTeacherStudents, mockStudentDetail, mockContentActivity, mockNotifications } from '@/mocks/teacher';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';

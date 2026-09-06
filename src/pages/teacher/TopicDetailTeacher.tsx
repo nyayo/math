@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { BookOpen, ClipboardCheck, Clock3, ArrowLeft, Plus, PencilLine, Trash2, AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useTopic, useLessons, useQuizzes } from '@/hooks/useLearning';
+import { useTopic, useLessons } from '@/hooks/useLearning';
 import { useUpdateTopic, useDeleteLesson } from '@/hooks/useTeacher';
 import { AppShell } from '@/components/layout/AppShell';
 import { Breadcrumb } from '@/components/shared/Breadcrumb';

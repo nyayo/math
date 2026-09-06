@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, ClipboardCheck, GraduationCap, Library, Plus, Users, AlertTriangle, ArrowRight, CheckCircle2, PencilLine } from 'lucide-react';
+import { BookOpen, ClipboardCheck, GraduationCap, Library, Plus, AlertTriangle, ArrowRight, CheckCircle2, PencilLine } from 'lucide-react';
 import { useTeacherOverview } from '@/hooks/useTeacher';
-import { useTopics, useLessons } from '@/hooks/useLearning';
+import { useTopics } from '@/hooks/useLearning';
 import { AppShell } from '@/components/layout/AppShell';
 import { Card } from '@/components/ui/card';
 import { Stat } from '@/components/ui/stat';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PageHeader } from '@/components/ui/page-header';
 import { Section } from '@/components/shared/Section';
 import { LoadingSkeleton, TopicsGridSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { useAuthStore } from '@/stores/authStore';
+
+// PageHeader intentionally not used — dashboard has custom hero
 
 export default function TeacherDashboard() {
   const user = useAuthStore((s) => s.user);

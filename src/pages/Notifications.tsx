@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bell, CheckCheck, BellOff, Trash2, Check, AlertTriangle, Trophy, GraduationCap, Sparkles } from 'lucide-react';
+import { CheckCheck, BellOff, Trash2, Check, AlertTriangle, Trophy, Sparkles } from 'lucide-react';
 import { useNotifications } from '@/hooks/useTeacher';
 import type { NotificationItem } from '@/types/teacher';
 import { AppShell } from '@/components/layout/AppShell';
@@ -36,7 +35,6 @@ function groupByDate(items: NotificationItem[]) {
 
 export default function Notifications() {
   const notifQuery = useNotifications();
-  const navigate = useNavigate();
   const [items, setItems] = React.useState<NotificationItem[]>([]);
 
   React.useEffect(() => { if (notifQuery.data) setItems(notifQuery.data); }, [notifQuery.data]);

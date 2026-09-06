@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft, Plus, Check, Trash2, Upload, X, FileJson } from 'lucide-react';
+import { ArrowLeft, Plus, Check, Trash2, Upload, FileJson } from 'lucide-react';
 import { useCreateQuestion, useBulkCreateQuestions } from '@/hooks/useTeacher';
 import { AppShell } from '@/components/layout/AppShell';
 import { Button } from '@/components/ui/button';
