@@ -4,6 +4,6 @@ import App from './App';
 import './index.css';
 import { useAuthStore } from '@/stores/authStore';
 
-useAuthStore.getState().refreshProfile().catch(() => useAuthStore.getState().setLoading(false));
+useAuthStore.getState().refreshProfile().catch(() => {}).finally(() => useAuthStore.getState().setLoading(false));
 
 createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>);

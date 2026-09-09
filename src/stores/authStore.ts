@@ -4,6 +4,33 @@ import { supabase, type Profile } from '@/services/supabase';
 
 type AuthUser = Profile;
 
+const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
+
+const mockUsers: Record<string, AuthUser> = {
+  'student@demo.com': {
+    id: 'demo-student',
+    first_name: 'Alex',
+    username: 'alex_student',
+    email: 'student@demo.com',
+    role: 'student',
+    level: 'Grade 10',
+    school: 'Demo High School',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  'teacher@demo.com': {
+    id: 'demo-teacher',
+    first_name: 'Jordan',
+    username: 'jordan_teacher',
+    email: 'teacher@demo.com',
+    role: 'teacher',
+    level: null,
+    school: 'Demo High School',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+};
+
 interface AuthState {
   user: AuthUser | null;
   isAuthenticated: boolean;
@@ -30,13 +57,19 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      isLoading: true,
+      isLoading: false,
 
       login: async (email, password) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        if (USE_MOCKS) {
+          const user = mockUsers[email];
+          if (!user || password !== 'password123') {
+            throw new Error('Invalid demo credentials. Use the demo buttons to fill in credentials.');
+          }
+          set({ user, isAuthenticated: true });
+          return;
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
 
         const { data: profile, error: profileError } = await supabase
@@ -52,6 +85,22 @@ export const useAuthStore = create<AuthState>()(
       },
 
       register: async (data) => {
+        if (USE_MOCKS) {
+          const user: AuthUser = {
+            id: `demo-${Date.now()}`,
+            first_name: data.firstName,
+            username: data.username,
+            email: data.email,
+            role: data.role,
+            level: data.level ?? null,
+            school: data.school ?? null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+          set({ user, isAuthenticated: true });
+          return;
+        }
+
         const { data: authData, error } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
@@ -81,11 +130,18 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        await supabase.auth.signOut();
+        if (!USE_MOCKS) {
+          await supabase.auth.signOut();
+        }
         set({ user: null, isAuthenticated: false });
       },
 
       refreshProfile: async () => {
+        if (USE_MOCKS) {
+          set({ isLoading: false });
+          return;
+        }
+
         const { data: sessionData } = await supabase.auth.getSession();
         if (!sessionData.session) {
           set({ user: null, isAuthenticated: false, isLoading: false });

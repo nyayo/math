@@ -23,7 +23,7 @@ export default function Login() {
   const [serverError, setServerError] = React.useState('');
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { remember: true } });
 
-  React.useEffect(() => { if (isAuthenticated) navigate('/dashboard', { replace: true }); }, [isAuthenticated, navigate]);
+  React.useEffect(() => { if (isAuthenticated) { const user = useAuthStore.getState().user; navigate(user?.role === 'teacher' ? '/teacher' : '/dashboard', { replace: true }); } }, [isAuthenticated, navigate]);
 
   const onSubmit = async (values: FormValues) => {
     setServerError('');
