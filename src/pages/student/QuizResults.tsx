@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
 
 function CountUp({ target, duration = 1500 }: { target: number; duration?: number }) {
   const [value, setValue] = React.useState(0);
@@ -83,7 +84,7 @@ export default function QuizResults() {
                 <span className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold', answer.is_correct ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-300')}>
                   {answer.is_correct ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
                 </span>
-                <span className="flex-1 text-sm font-medium text-ink-800 dark:text-ink-100">{answer.question_text}</span>
+                <span className="flex-1 text-sm font-medium text-ink-800 dark:text-ink-100"><MarkdownRenderer content={answer.question_text} className="prose-headings:text-sm prose-headings:font-medium prose-p:text-sm prose-p:font-medium prose-p:my-0" /></span>
                 {expanded.has(i) ? <ChevronUp className="h-4 w-4 text-ink-400" /> : <ChevronDown className="h-4 w-4 text-ink-400" />}
               </button>
               <motion.div initial={false} animate={{ height: expanded.has(i) ? 'auto' : 0, opacity: expanded.has(i) ? 1 : 0 }} className="overflow-hidden">

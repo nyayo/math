@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E'];
 
@@ -79,7 +80,7 @@ export default function QuizDetail() {
         <AnimatePresence mode="wait">
           <motion.div key={question.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
             <Card className="p-6 sm:p-8">
-              <p className="text-lg font-semibold leading-7 text-ink-900 dark:text-ink-100">{question.text}</p>
+              <MarkdownRenderer content={question.text} className="prose-headings:text-lg prose-headings:font-semibold prose-p:text-lg prose-p:font-semibold prose-p:leading-7 prose-p:text-ink-900 dark:prose-p:text-ink-100" />
               <div className="mt-6 space-y-3" onKeyDown={handleKeyDown}>
                 {question.type === 'multiple_choice' && question.choices?.map((choice, i) => {
                   const selected = answers[question.id] === choice;

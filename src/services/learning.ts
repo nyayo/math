@@ -3,9 +3,9 @@ import { mockTopics } from '@/mocks/topics';
 import { mockLessons } from '@/mocks/lessons';
 import { mockQuizzes, mockQuestions } from '@/mocks/quizzes';
 import { mockAttempts } from '@/mocks/analytics';
+import { get, post } from '@/lib/api';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -26,9 +26,11 @@ export async function getTopics(filters?: { level?: string; search?: string; pag
     const pageResults = results.slice(start, start + perPage);
     return { results: pageResults, hasMore: start + perPage < results.length };
   }
-  const res = await fetch(`${API_BASE}/api/learning/topics/?${new URLSearchParams(filters as Record<string, string>)}`);
-  if (!res.ok) throw new Error('Failed to load topics');
-  return res.json();
+  const params = new URLSearchParams();
+  if (filters?.level) params.set('level', filters.level);
+  if (filters?.search) params.set('search', filters.search);
+  if (filters?.page) params.set('page', String(filters.page));
+  return get(`/api/learning/topics/?${params}`);
 }
 
 export async function getTopic(id: string): Promise<Topic> {
@@ -38,9 +40,7 @@ export async function getTopic(id: string): Promise<Topic> {
     if (!topic) throw new Error('Topic not found');
     return topic;
   }
-  const res = await fetch(`${API_BASE}/api/learning/topics/${id}/`);
-  if (!res.ok) throw new Error('Failed to load topic');
-  return res.json();
+  return get(`/api/learning/topics/${id}/`);
 }
 
 export async function getLessonsByTopic(topicId: string): Promise<Lesson[]> {
@@ -48,9 +48,7 @@ export async function getLessonsByTopic(topicId: string): Promise<Lesson[]> {
     await delay(300);
     return mockLessons.filter((l) => l.topic_id === topicId).sort((a, b) => a.order - b.order);
   }
-  const res = await fetch(`${API_BASE}/api/learning/topics/${topicId}/lessons/`);
-  if (!res.ok) throw new Error('Failed to load lessons');
-  return res.json();
+  return get(`/api/learning/topics/${topicId}/lessons/`);
 }
 
 export async function getLesson(id: string): Promise<Lesson> {
@@ -60,9 +58,7 @@ export async function getLesson(id: string): Promise<Lesson> {
     if (!lesson) throw new Error('Lesson not found');
     return lesson;
   }
-  const res = await fetch(`${API_BASE}/api/learning/lessons/${id}/`);
-  if (!res.ok) throw new Error('Failed to load lesson');
-  return res.json();
+  return get(`/api/learning/lessons/${id}/`);
 }
 
 export async function getQuizzesByLesson(lessonId: string): Promise<Quiz[]> {
@@ -70,9 +66,7 @@ export async function getQuizzesByLesson(lessonId: string): Promise<Quiz[]> {
     await delay(300);
     return mockQuizzes.filter((q) => q.lesson_id === lessonId);
   }
-  const res = await fetch(`${API_BASE}/api/learning/lessons/${lessonId}/quizzes/`);
-  if (!res.ok) throw new Error('Failed to load quizzes');
-  return res.json();
+  return get(`/api/learning/lessons/${lessonId}/quizzes/`);
 }
 
 export async function getQuiz(id: string): Promise<Quiz> {
@@ -82,9 +76,7 @@ export async function getQuiz(id: string): Promise<Quiz> {
     if (!quiz) throw new Error('Quiz not found');
     return quiz;
   }
-  const res = await fetch(`${API_BASE}/api/learning/quizzes/${id}/`);
-  if (!res.ok) throw new Error('Failed to load quiz');
-  return res.json();
+  return get(`/api/learning/quizzes/${id}/`);
 }
 
 export async function getQuestions(quizId: string): Promise<Question[]> {
@@ -92,9 +84,7 @@ export async function getQuestions(quizId: string): Promise<Question[]> {
     await delay(400);
     return mockQuestions.filter((q) => q.quiz_id === quizId).sort((a, b) => a.order - b.order);
   }
-  const res = await fetch(`${API_BASE}/api/learning/quizzes/${quizId}/questions/`);
-  if (!res.ok) throw new Error('Failed to load questions');
-  return res.json();
+  return get(`/api/learning/quizzes/${quizId}/questions/`);
 }
 
 export async function submitAttempt(quizId: string, answers: Record<string, string>): Promise<Attempt> {
@@ -125,15 +115,10 @@ export async function submitAttempt(quizId: string, answers: Record<string, stri
       created_at: new Date().toISOString(),
     };
   }
-  const res = await fetch(`${API_BASE}/api/learning/quizzes/${quizId}/attempts/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ answers }),
-  });
-  if (!res.ok) throw new Error('Failed to submit attempt');
-  return res.json();
+  return post(`/api/learning/quizzes/${quizId}/attempts/`, { answers });
 }
 
+// backend endpoint not implemented yet — using mock/fallback data
 export async function getAttempt(quizId: string, attemptId: string): Promise<Attempt> {
   if (USE_MOCKS) {
     await delay(300);
@@ -152,7 +137,18 @@ export async function getAttempt(quizId: string, attemptId: string): Promise<Att
       created_at: new Date().toISOString(),
     };
   }
-  const res = await fetch(`${API_BASE}/api/learning/quizzes/${quizId}/attempts/${attemptId}/`);
-  if (!res.ok) throw new Error('Failed to load attempt');
-  return res.json();
+  // backend endpoint not implemented yet — using mock/fallback data
+  await delay(300);
+  const quiz = mockQuizzes.find((q) => q.id === quizId);
+  return {
+    id: attemptId,
+    quiz_id: quizId,
+    quiz_title: quiz?.title ?? 'Quiz',
+    score: 4,
+    total: 5,
+    percentage: 80,
+    xp_earned: 80,
+    answers: [],
+    created_at: new Date().toISOString(),
+  };
 }

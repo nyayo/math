@@ -1,6 +1,7 @@
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import * as React from 'react';
+import renderMathInElement from 'katex/contrib/auto-render';
 import { cn } from '@/lib/utils';
 
 export function MarkdownRenderer({ content, className }: { content: string; className?: string }) {
@@ -22,6 +23,13 @@ export function MarkdownRenderer({ content, className }: { content: string; clas
       button.innerHTML = copied === id ? '✓' : '⧉';
       button.onclick = () => { void copyCode(code, id); };
       block.appendChild(button);
+    });
+    renderMathInElement(container, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false },
+      ],
+      throwOnError: false,
     });
   }, [html, copied]);
   return <div ref={containerRef} className={cn('prose prose-slate max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-brand-600 prose-strong:text-ink-900 dark:prose-strong:text-ink-100', className)} dangerouslySetInnerHTML={{ __html: html }} />;

@@ -1,7 +1,8 @@
 import type { AISession, ChatMessage } from '@/types/learning';
+import { get, post } from '@/lib/api';
+import { API_BASE } from '@/lib/api';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -140,13 +141,7 @@ export async function askAI(params: { session_id?: string; topic: string; questi
     await delay(800);
     return { session_id: params.session_id ?? `session-${Date.now()}`, response: getMockResponse(params.question) };
   }
-  const res = await fetch(`${API_BASE}/api/ai/tutor/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
-  });
-  if (!res.ok) throw new Error('AI request failed');
-  return res.json();
+  return post('/api/ai-tutor/ask-ai-tutor/', params);
 }
 
 export async function askAIStream(
@@ -172,7 +167,7 @@ export async function askAIStream(
   }
 
   try {
-    const res = await fetch(`${API_BASE}/api/ai/tutor/stream/`, {
+    const res = await fetch(`${API_BASE}/api/ai-tutor/ask-ai-tutor/stream/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -189,20 +184,39 @@ export async function askAIStream(
       const { done, value } = await reader.read();
       if (done) break;
       buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n\n');
-      buffer = lines.pop() ?? '';
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.token) {
-              fullText += data.token;
-              onToken(data.token);
+      const blocks = buffer.split('\n\n');
+      buffer = blocks.pop() ?? '';
+      for (const block of blocks) {
+        const lines = block.split('\n');
+        let hasDoneEvent = false;
+        let dataLine: string | null = null;
+        for (const line of lines) {
+          if (line.startsWith('event: done')) {
+            hasDoneEvent = true;
+          } else if (line.startsWith('data: ')) {
+            const dataContent = line.slice(6);
+            try {
+              const data = JSON.parse(dataContent);
+              if (data.token) {
+                fullText += data.token;
+                onToken(data.token);
+              }
+              if (data.session_id) sessionId = data.session_id;
+              if (data.done) {
+                hasDoneEvent = true;
+              }
+            } catch {
+              // skip malformed chunks
             }
+            dataLine = dataContent;
+          }
+        }
+        if (hasDoneEvent && dataLine) {
+          try {
+            const data = JSON.parse(dataLine);
             if (data.session_id) sessionId = data.session_id;
-            if (data.done) onDone(fullText, sessionId);
           } catch {
-            // skip malformed chunks
+            // skip
           }
         }
       }
@@ -222,9 +236,7 @@ export async function getSessions(): Promise<AISession[]> {
       { id: 'session-3', topic: 'Trigonometry', preview: 'Explain the unit circle', message_count: 3, created_at: '2026-08-25T16:00:00Z' },
     ];
   }
-  const res = await fetch(`${API_BASE}/api/ai/sessions/`);
-  if (!res.ok) throw new Error('Failed to load sessions');
-  return res.json();
+  return get('/api/ai-tutor/sessions/');
 }
 
 export async function getSession(id: string): Promise<{ session: AISession; messages: ChatMessage[] }> {
@@ -238,7 +250,5 @@ export async function getSession(id: string): Promise<{ session: AISession; mess
       ],
     };
   }
-  const res = await fetch(`${API_BASE}/api/ai/sessions/${id}/`);
-  if (!res.ok) throw new Error('Failed to load session');
-  return res.json();
+  return get(`/api/ai-tutor/sessions/${id}/`);
 }
