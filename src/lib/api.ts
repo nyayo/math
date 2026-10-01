@@ -1,4 +1,4 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import axios, { type AxiosError, type InternalAxiosRequestConfig, type AxiosRequestConfig } from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -72,22 +72,24 @@ api.interceptors.response.use(
   }
 );
 
-export async function get<T = unknown>(url: string, config?: Parameters<typeof api.get>[1]): Promise<T> {
+export type ApiRequestConfig = AxiosRequestConfig & { skipAuth?: boolean };
+
+export async function get<T = unknown>(url: string, config?: ApiRequestConfig): Promise<T> {
   const res = await api.get<T>(url, config);
   return res.data;
 }
 
-export async function post<T = unknown>(url: string, data?: unknown, config?: Parameters<typeof api.post>[2]): Promise<T> {
+export async function post<T = unknown>(url: string, data?: unknown, config?: ApiRequestConfig): Promise<T> {
   const res = await api.post<T>(url, data, config);
   return res.data;
 }
 
-export async function patch<T = unknown>(url: string, data?: unknown, config?: Parameters<typeof api.patch>[2]): Promise<T> {
+export async function patch<T = unknown>(url: string, data?: unknown, config?: ApiRequestConfig): Promise<T> {
   const res = await api.patch<T>(url, data, config);
   return res.data;
 }
 
-export async function del<T = unknown>(url: string, config?: Parameters<typeof api.delete>[1]): Promise<T> {
+export async function del<T = unknown>(url: string, config?: ApiRequestConfig): Promise<T> {
   const res = await api.delete<T>(url, config);
   return res.data;
 }

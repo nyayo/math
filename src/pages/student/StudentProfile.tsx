@@ -74,7 +74,7 @@ export default function StudentProfile() {
               <p className="mt-1 text-sm text-ink-500">{user?.email}</p>
               <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <Badge tone="brand">Student</Badge>
-                <Badge tone="neutral">{user?.level ?? 'S1'}</Badge>
+                <Badge tone="neutral">S1</Badge>
                 <Badge tone="accent">@{user?.username ?? 'learner'}</Badge>
               </div>
             </div>

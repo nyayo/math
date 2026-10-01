@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { get, post, configureApiAuth } from '@/lib/api';
+import { get as apiGet, post as apiPost, configureApiAuth, type ApiRequestConfig } from '@/lib/api';
 
 export type AuthUser = {
   id: number;
@@ -74,9 +74,9 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
 
-        const { access, refresh } = await post<{ access: string; refresh: string }>('/api/accounts/login/', { username, password }, { skipAuth: true } as never);
+        const { access, refresh } = await apiPost<{ access: string; refresh: string }>('/api/accounts/login/', { username, password }, { skipAuth: true } satisfies ApiRequestConfig);
         set({ accessToken: access, refreshToken: refresh });
-        const profile = await get<AuthUser>('/api/accounts/profile/');
+        const profile = await apiGet<AuthUser>('/api/accounts/profile/');
         set({ user: profile, isAuthenticated: true });
       },
 
@@ -94,7 +94,7 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
 
-        const res = await post<{ user: AuthUser; access: string; refresh: string }>('/api/accounts/register/', data, { skipAuth: true } as never);
+        const res = await apiPost<{ user: AuthUser; access: string; refresh: string }>('/api/accounts/register/', data, { skipAuth: true } satisfies ApiRequestConfig);
         set({ user: res.user, accessToken: res.access, refreshToken: res.refresh, isAuthenticated: true });
       },
 
@@ -113,7 +113,7 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
         try {
-          const profile = await get<AuthUser>('/api/accounts/profile/');
+          const profile = await apiGet<AuthUser>('/api/accounts/profile/');
           set({ user: profile, isAuthenticated: true, isLoading: false });
         } catch {
           set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false, isLoading: false });

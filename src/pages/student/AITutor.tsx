@@ -52,7 +52,7 @@ export default function AITutor() {
 
   const handleSend = () => {
     if (!input.trim() || isStreaming) return;
-    void sendMessage(input, selectedTopic, user?.level ?? undefined);
+    void sendMessage(input, selectedTopic, undefined);
     setInput('');
   };
 

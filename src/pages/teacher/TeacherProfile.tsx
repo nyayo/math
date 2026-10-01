@@ -72,7 +72,7 @@ export default function TeacherProfile() {
               <p className="mt-1 text-sm text-ink-500">{user?.email}</p>
               <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <Badge tone="accent">Teacher</Badge>
-                <Badge tone="neutral">{user?.school ?? 'MathMaster Academy'}</Badge>
+                <Badge tone="neutral">MathMaster Academy</Badge>
               </div>
             </div>
           </div>

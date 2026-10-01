@@ -11,7 +11,7 @@ export function ProtectedRoute({ children, role }: { children: React.ReactNode; 
   return <>{children}</>;
 }
 
-export function RoleGate({ roles, children }: { roles: Array<'student' | 'teacher'>; children: React.ReactNode }) {
+export function RoleGate({ roles, children }: { roles: Array<'student' | 'teacher' | 'admin'>; children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user);
   return user && roles.includes(user.role) ? <>{children}</> : null;
 }
