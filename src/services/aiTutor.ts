@@ -1,5 +1,5 @@
 import type { AISession, ChatMessage } from '@/types/learning';
-import { get, post } from '@/lib/api';
+import { get, post, del } from '@/lib/api';
 import { API_BASE } from '@/lib/api';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
@@ -251,4 +251,12 @@ export async function getSession(id: string): Promise<{ session: AISession; mess
     };
   }
   return get(`/api/ai-tutor/sessions/${id}/`);
+}
+
+export async function deleteSession(id: string): Promise<void> {
+  if (USE_MOCKS) {
+    await delay(200);
+    return;
+  }
+  await del(`/api/ai-tutor/sessions/${id}/`);
 }
