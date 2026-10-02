@@ -4,20 +4,23 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   Bell,
   BookOpen,
+  Camera,
   ChevronLeft,
   CircleUserRound,
+  FileText,
   Home,
   LayoutDashboard,
+  Library,
   LogOut,
   Menu,
   Moon,
+  ScanLine,
   Search,
   Settings,
   Sparkles,
   Sun,
   Users,
   X,
-  Library,
   BarChart3,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
@@ -41,6 +44,9 @@ type NavItem = { label: string; href: string; icon: React.ElementType };
 const studentNav: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: Home },
   { label: 'Topics', href: '/topics', icon: BookOpen },
+  { label: 'Snap & Solve', href: '/scan', icon: Camera },
+  { label: 'Documents', href: '/documents', icon: FileText },
+  { label: 'Curriculum', href: '/curriculum', icon: Library },
   { label: 'AI Tutor', href: '/ai-tutor', icon: Sparkles },
   { label: 'Performance', href: '/performance', icon: BarChart3 },
 ];
@@ -48,6 +54,7 @@ const studentNav: NavItem[] = [
 const teacherNav: NavItem[] = [
   { label: 'Dashboard', href: '/teacher', icon: LayoutDashboard },
   { label: 'Curriculum', href: '/teacher/curriculum', icon: Library },
+  { label: 'Past Paper → Quiz', href: '/teacher/past-paper', icon: ScanLine },
   { label: 'Students', href: '/teacher/students', icon: Users },
   { label: 'Content', href: '/teacher/content', icon: BookOpen },
 ];

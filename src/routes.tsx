@@ -28,6 +28,15 @@ import AuthoringQuestion from '@/pages/teacher/AuthoringQuestion';
 import TeacherProfile from '@/pages/teacher/TeacherProfile';
 import Settings from '@/pages/Settings';
 import Notifications from '@/pages/Notifications';
+import ScanIndex from '@/pages/pillar1/scan/Index';
+import ScanUpload from '@/pages/pillar1/scan/Upload';
+import ScanResult from '@/pages/pillar1/scan/Result';
+import DocumentsIndex from '@/pages/pillar1/documents/Index';
+import DocumentsUpload from '@/pages/pillar1/documents/Upload';
+import DocumentDetail from '@/pages/pillar1/documents/Detail';
+import CurriculumIndex from '@/pages/pillar1/curriculum/Index';
+import CurriculumTopic from '@/pages/pillar1/curriculum/Topic';
+import PastPaper from '@/pages/pillar1/teacher/PastPaper';
 
 export default function AppRoutes() {
   return (
@@ -49,6 +58,14 @@ export default function AppRoutes() {
       <Route path="/ai-tutor" element={<ProtectedRoute role="student"><AITutor /></ProtectedRoute>} />
       <Route path="/performance" element={<ProtectedRoute role="student"><Performance /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
+      <Route path="/scan" element={<ProtectedRoute><ScanIndex /></ProtectedRoute>} />
+      <Route path="/scan/upload" element={<ProtectedRoute><ScanUpload /></ProtectedRoute>} />
+      <Route path="/scan/result" element={<ProtectedRoute><ScanResult /></ProtectedRoute>} />
+      <Route path="/documents" element={<ProtectedRoute><DocumentsIndex /></ProtectedRoute>} />
+      <Route path="/documents/upload" element={<ProtectedRoute><DocumentsUpload /></ProtectedRoute>} />
+      <Route path="/documents/:id" element={<ProtectedRoute><DocumentDetail /></ProtectedRoute>} />
+      <Route path="/curriculum" element={<ProtectedRoute><CurriculumIndex /></ProtectedRoute>} />
+      <Route path="/curriculum/topic" element={<ProtectedRoute><CurriculumTopic /></ProtectedRoute>} />
 
       {/* Teacher */}
       <Route path="/teacher" element={<ProtectedRoute role="teacher"><TeacherDashboard /></ProtectedRoute>} />
@@ -62,6 +79,7 @@ export default function AppRoutes() {
       <Route path="/teacher/content/quizzes/new" element={<ProtectedRoute role="teacher"><AuthoringQuiz /></ProtectedRoute>} />
       <Route path="/teacher/content/questions/new" element={<ProtectedRoute role="teacher"><AuthoringQuestion /></ProtectedRoute>} />
       <Route path="/teacher/profile" element={<ProtectedRoute role="teacher"><TeacherProfile /></ProtectedRoute>} />
+      <Route path="/teacher/past-paper" element={<ProtectedRoute role="teacher"><PastPaper /></ProtectedRoute>} />
 
       {/* Shared */}
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

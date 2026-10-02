@@ -6,6 +6,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Input, Label } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UploadProgressModal } from '@/components/pillar1/UploadProgressModal';

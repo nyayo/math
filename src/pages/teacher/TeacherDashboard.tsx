@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, ClipboardCheck, GraduationCap, Library, Plus, AlertTriangle, ArrowRight, CheckCircle2, PencilLine } from 'lucide-react';
+import { BookOpen, ClipboardCheck, GraduationCap, Library, Plus, AlertTriangle, ArrowRight, CheckCircle2, PencilLine, ScanLine } from 'lucide-react';
 import { useTeacherOverview } from '@/hooks/useTeacher';
 import { useTopics } from '@/hooks/useLearning';
 import { AppShell } from '@/components/layout/AppShell';
@@ -56,10 +56,11 @@ export default function TeacherDashboard() {
       </div>
 
       {/* Quick actions */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link to="/teacher/content/topics/new"><motion.div whileHover={{ y: -4 }} className="flex items-center gap-4 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 p-5 text-white shadow-soft"><Plus className="h-7 w-7" /><div><p className="font-semibold">Add topic</p><p className="text-sm text-white/75">Create a new topic</p></div></motion.div></Link>
         <Link to="/teacher/content/lessons/new"><motion.div whileHover={{ y: -4 }} className="flex items-center gap-4 rounded-2xl bg-gradient-to-br from-accent-500 to-indigo-600 p-5 text-white shadow-soft"><Plus className="h-7 w-7" /><div><p className="font-semibold">Add lesson</p><p className="text-sm text-white/75">Write a new lesson</p></div></motion.div></Link>
         <Link to="/teacher/content/quizzes/new"><motion.div whileHover={{ y: -4 }} className="flex items-center gap-4 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-5 text-white shadow-soft"><Plus className="h-7 w-7" /><div><p className="font-semibold">Add quiz</p><p className="text-sm text-white/75">Create a quiz</p></div></motion.div></Link>
+        <Link to="/teacher/past-paper"><motion.div whileHover={{ y: -4 }} className="flex items-center gap-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-5 text-white shadow-soft"><ScanLine className="h-7 w-7" /><div><p className="font-semibold">Past Paper → Quiz</p><p className="text-sm text-white/75">Extract from PDF</p></div></motion.div></Link>
       </div>
 
       {/* Curriculum map + Featured */}

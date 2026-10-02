@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { BookOpen, ClipboardCheck, Clock3, ArrowLeft } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Clock3, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useTopic, useLessons } from '@/hooks/useLearning';
 import { AppShell } from '@/components/layout/AppShell';
 import { Breadcrumb } from '@/components/shared/Breadcrumb';
@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Stat } from '@/components/ui/stat';
+import { UNEBCodeBadge } from '@/components/pillar1/UNEBCodeBadge';
+import { Link } from 'react-router-dom';
 
 export default function TopicDetail() {
   const { topicId } = useParams();
@@ -35,9 +37,11 @@ export default function TopicDetail() {
             <div className="flex flex-wrap gap-2">
               <Badge tone="brand">{topic.level}</Badge>
               <Badge tone="neutral">{topic.subject}</Badge>
+              <UNEBCodeBadge code={`${topic.level}.M.A.1`} />
             </div>
             <h1 className="mt-4 text-2xl font-bold tracking-tight text-ink-900 dark:text-white sm:text-3xl">{topic.name}</h1>
             <p className="mt-3 text-sm leading-6 text-ink-500 dark:text-ink-400">{topic.description}</p>
+            <Link to={`/curriculum/topic?code=${encodeURIComponent(`${topic.level}.M.A.1`)}`} className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">View in syllabus <ExternalLink className="h-3 w-3" /></Link>
           </div>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">

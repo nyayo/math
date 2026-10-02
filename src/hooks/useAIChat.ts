@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { toast } from 'react-hot-toast';
 import type { ChatMessage } from '@/types/learning';
-import { askAIStream, getSession, getSessions } from '@/services/aiTutor';
+import { askAIStream, getSession, getSessions, deleteSession } from '@/services/aiTutor';
 
 export function useAIChat() {
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
@@ -51,7 +51,18 @@ export function useAIChat() {
     }
   }, []);
 
+  const removeSession = React.useCallback(async (id: string) => {
+    try {
+      await deleteSession(id);
+      setSessions((prev) => prev.filter((s) => s.id !== id));
+      if (currentSessionId === id) { setCurrentSessionId(null); setMessages([]); }
+      toast.success('Conversation deleted');
+    } catch {
+      toast.error('Could not delete conversation');
+    }
+  }, [currentSessionId]);
+
   const newChat = React.useCallback(() => { setCurrentSessionId(null); setMessages([]); }, []);
 
-  return { messages, isStreaming, currentSessionId, sessions, isLoadingSessions, sendMessage, loadSession, newChat };
+  return { messages, isStreaming, currentSessionId, sessions, isLoadingSessions, sendMessage, loadSession, removeSession, newChat };
 }
