@@ -151,3 +151,8 @@ configureApiAuth({
   onAuthRefreshed: (token) => useAuthStore.setState({ accessToken: token }),
   onAuthFailed: () => useAuthStore.getState().logout(),
 });
+
+// Wire the school context header to the school store
+import { configureApiSchool } from '@/lib/api';
+import { useSchoolStore } from '@/stores/schoolStore';
+configureApiSchool(() => useSchoolStore.getState().currentSchool?.id ?? null);

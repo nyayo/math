@@ -37,6 +37,20 @@ import DocumentDetail from '@/pages/pillar1/documents/Detail';
 import CurriculumIndex from '@/pages/pillar1/curriculum/Index';
 import CurriculumTopic from '@/pages/pillar1/curriculum/Topic';
 import PastPaper from '@/pages/pillar1/teacher/PastPaper';
+import AdminDashboard from '@/pages/admin/Index';
+import SchoolProfile from '@/pages/admin/School';
+import Members from '@/pages/admin/Members';
+import MemberDetail from '@/pages/admin/MemberDetail';
+import InviteMember from '@/pages/admin/Invite';
+import BulkImport from '@/pages/admin/BulkImport';
+import Classes from '@/pages/admin/Classes';
+import ClassDetail from '@/pages/admin/ClassDetail';
+import Billing from '@/pages/admin/Billing';
+import Plans from '@/pages/admin/Plans';
+import AdminAudit from '@/pages/admin/Audit';
+import AdminSettings from '@/pages/admin/Settings';
+import Onboarding from '@/pages/onboarding/Welcome';
+import JoinSchool from '@/pages/onboarding/JoinSchool';
 
 export default function AppRoutes() {
   return (
@@ -80,6 +94,24 @@ export default function AppRoutes() {
       <Route path="/teacher/content/questions/new" element={<ProtectedRoute role="teacher"><AuthoringQuestion /></ProtectedRoute>} />
       <Route path="/teacher/profile" element={<ProtectedRoute role="teacher"><TeacherProfile /></ProtectedRoute>} />
       <Route path="/teacher/past-paper" element={<ProtectedRoute role="teacher"><PastPaper /></ProtectedRoute>} />
+
+      {/* School admin */}
+      <Route path="/admin" element={<ProtectedRoute roles={['owner', 'admin']}><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/school" element={<ProtectedRoute roles={['owner', 'admin']}><SchoolProfile /></ProtectedRoute>} />
+      <Route path="/admin/members" element={<ProtectedRoute roles={['owner', 'admin']}><Members /></ProtectedRoute>} />
+      <Route path="/admin/members/invite" element={<ProtectedRoute roles={['owner', 'admin']}><InviteMember /></ProtectedRoute>} />
+      <Route path="/admin/members/bulk-import" element={<ProtectedRoute roles={['owner', 'admin']}><BulkImport /></ProtectedRoute>} />
+      <Route path="/admin/members/:id" element={<ProtectedRoute roles={['owner', 'admin']}><MemberDetail /></ProtectedRoute>} />
+      <Route path="/admin/classes" element={<ProtectedRoute roles={['owner', 'admin']}><Classes /></ProtectedRoute>} />
+      <Route path="/admin/classes/:id" element={<ProtectedRoute roles={['owner', 'admin']}><ClassDetail /></ProtectedRoute>} />
+      <Route path="/admin/billing" element={<ProtectedRoute roles={['owner', 'admin']}><Billing /></ProtectedRoute>} />
+      <Route path="/admin/billing/plans" element={<ProtectedRoute roles={['owner', 'admin']}><Plans /></ProtectedRoute>} />
+      <Route path="/admin/audit" element={<ProtectedRoute roles={['owner', 'admin']}><AdminAudit /></ProtectedRoute>} />
+      <Route path="/admin/settings" element={<ProtectedRoute roles={['owner', 'admin']}><AdminSettings /></ProtectedRoute>} />
+
+      {/* Onboarding & join */}
+      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+      <Route path="/join-school" element={<JoinSchool />} />
 
       {/* Shared */}
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   Bell,
   BookOpen,
+  Building2,
   Camera,
   ChevronLeft,
   CircleUserRound,
@@ -38,6 +39,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SearchModal } from '@/components/shared/SearchModal';
+import { SchoolSwitcher } from '@/components/school/SchoolSwitcher';
+import { useSchoolStore } from '@/stores/schoolStore';
 
 type NavItem = { label: string; href: string; icon: React.ElementType };
 
@@ -57,6 +60,15 @@ const teacherNav: NavItem[] = [
   { label: 'Past Paper → Quiz', href: '/teacher/past-paper', icon: ScanLine },
   { label: 'Students', href: '/teacher/students', icon: Users },
   { label: 'Content', href: '/teacher/content', icon: BookOpen },
+];
+
+const adminNav: NavItem[] = [
+  { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { label: 'Members', href: '/admin/members', icon: Users },
+  { label: 'Classes', href: '/admin/classes', icon: Building2 },
+  { label: 'Billing', href: '/admin/billing', icon: FileText },
+  { label: 'School', href: '/admin/school', icon: Settings },
+  { label: 'Audit Log', href: '/admin/audit', icon: BarChart3 },
 ];
 
 function Logo({ collapsed = false }: { collapsed?: boolean }) {
@@ -109,6 +121,7 @@ function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
         <kbd className="ml-auto rounded-md border border-ink-200 bg-white px-1.5 py-0.5 text-[10px] font-medium dark:border-ink-600 dark:bg-ink-700">⌘ K</kbd>
       </button>
       <div className="flex items-center gap-1.5 sm:gap-3">
+        <div className="hidden lg:block"><SchoolSwitcher /></div>
         <button onClick={() => navigate('/notifications')} className="relative rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800 dark:hover:bg-ink-800 dark:hover:text-ink-200" aria-label="Notifications">
           <Bell className="h-5 w-5" />
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full border-2 border-white bg-danger dark:border-ink-900" />
@@ -141,7 +154,9 @@ function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
 function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: { collapsed: boolean; onToggle: () => void; mobileOpen: boolean; onMobileClose: () => void }) {
   const location = window.location.pathname;
   const { user } = useAuthStore();
-  const navItems = user?.role === 'teacher' ? teacherNav : studentNav;
+  const { currentMembership } = useSchoolStore();
+  const isAdminRoute = location.startsWith('/admin');
+  const navItems = isAdminRoute ? adminNav : user?.role === 'teacher' ? teacherNav : studentNav;
   const initials = user?.first_name?.slice(0, 1).toUpperCase() ?? 'M';
   const profileHref = user?.role === 'teacher' ? '/teacher/profile' : '/profile';
 
@@ -193,4 +208,4 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-export { studentNav, teacherNav };
+export { studentNav, teacherNav, adminNav };

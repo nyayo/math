@@ -9,6 +9,7 @@ export const api = axios.create({
 });
 
 let getAuthState: () => { accessToken: string | null; refreshToken: string | null } = () => ({ accessToken: null, refreshToken: null });
+let getSchoolId: () => string | null = () => null;
 let onAuthRefreshed: (token: string) => void = () => {};
 let onAuthFailed: () => void = () => {};
 
@@ -22,6 +23,10 @@ export function configureApiAuth(opts: {
   onAuthFailed = opts.onAuthFailed;
 }
 
+export function configureApiSchool(getter: () => string | null) {
+  getSchoolId = getter;
+}
+
 // Attach access token to every request unless explicitly skipped
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const skipAuth = (config as InternalAxiosRequestConfig & { skipAuth?: boolean }).skipAuth;
@@ -30,6 +35,10 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+  }
+  const schoolId = getSchoolId();
+  if (schoolId) {
+    config.headers['X-School-Id'] = schoolId;
   }
   return config;
 });
@@ -133,6 +142,8 @@ export function uploadFile(
     xhr.open('POST', `${API_BASE}${url}`);
     const { accessToken } = getAuthState();
     if (accessToken) xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+    const schoolId = getSchoolId();
+    if (schoolId) xhr.setRequestHeader('X-School-Id', schoolId);
     xhr.send(formData);
   });
 }
@@ -154,12 +165,13 @@ export async function streamSSE(
   const { onToken, onCitation, onDone, onError } = callbacks;
   try {
     const { accessToken } = getAuthState();
+    const schoolId = getSchoolId();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+    if (schoolId) headers['X-School-Id'] = schoolId;
     const res = await fetch(`${API_BASE}${url}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      },
+      headers,
       body: JSON.stringify(body),
     });
     if (!res.ok || !res.body) throw new Error('Stream request failed');
