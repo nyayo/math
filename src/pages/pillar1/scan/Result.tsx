@@ -51,7 +51,7 @@ export default function ScanResult() {
         </Card>
 
         <div className="space-y-4">
-          <TopicContextCard code={scan.topic_code} topicName={scan.topic_name} level={scan.topic_code.split('.')[0]} textbookRef={scan.textbook_ref} />
+          <TopicContextCard code={scan.topic_code ?? ''} topicName={scan.topic_name ?? ''} level={scan.topic_code ? scan.topic_code.split('.')[0] : ''} textbookRef={scan.textbook_ref ?? undefined} />
 
           <Tabs defaultValue="solution">
             <TabsList>
@@ -69,7 +69,7 @@ export default function ScanResult() {
                 </div>
                 <div className="mt-4 flex items-center gap-4">
                   <ConfidenceIndicator value={scan.confidence} />
-                  {scan.context_tags.map((tag) => <LocalContextPill key={tag} label={tag} />)}
+                  {(scan.context_tags ?? []).map((tag) => <LocalContextPill key={tag} label={tag} />)}
                 </div>
                 <div className="mt-4 flex gap-2">
                   <Button variant="secondary" size="sm"><Save className="h-4 w-4" /> Save to notes</Button>
