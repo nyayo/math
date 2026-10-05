@@ -195,8 +195,15 @@ export async function askAIStream(
     return;
   }
   try {
+    const { useAuthStore } = await import('@/stores/authStore');
+    const { getSchoolId } = await import('@/lib/api');
+    const accessToken = useAuthStore.getState().accessToken;
+    const schoolId = getSchoolId();
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+    if (schoolId) headers['X-School-Id'] = schoolId;
     const res = await fetch(`${API_BASE}/api/ai-tutor/ask-ai-tutor/stream/`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers,
       body: JSON.stringify(params),
     });
     if (!res.ok || !res.body) throw new Error('Stream request failed');

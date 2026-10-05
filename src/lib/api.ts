@@ -9,7 +9,7 @@ export const api = axios.create({
 });
 
 let getAuthState: () => { accessToken: string | null; refreshToken: string | null } = () => ({ accessToken: null, refreshToken: null });
-let getSchoolId: () => string | null = () => null;
+let schoolIdGetter: () => string | null = () => null;
 let onAuthRefreshed: (token: string) => void = () => {};
 let onAuthFailed: () => void = () => {};
 
@@ -24,7 +24,11 @@ export function configureApiAuth(opts: {
 }
 
 export function configureApiSchool(getter: () => string | null) {
-  getSchoolId = getter;
+  schoolIdGetter = getter;
+}
+
+export function getSchoolId(): string | null {
+  return schoolIdGetter();
 }
 
 // Attach access token to every request unless explicitly skipped
