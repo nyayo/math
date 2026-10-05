@@ -243,7 +243,16 @@ export async function getSessions(): Promise<AISession[]> {
       { id: 'session-3', topic: 'Trigonometry', preview: 'Explain the unit circle', message_count: 3, created_at: '2026-08-25T16:00:00Z' },
     ];
   }
-  return get('/api/ai-tutor/sessions/');
+  // Global DRF pagination wraps the list as {count, next, previous, results}.
+  const data = await get<unknown>('/api/ai-tutor/sessions/');
+  const items = Array.isArray(data) ? data : (data as { results?: unknown[] })?.results ?? [];
+  return (items as any[]).map((s) => ({
+    id: String(s.id),
+    topic: s.topic ?? '',
+    preview: s.preview ?? s.title ?? '',
+    message_count: s.message_count ?? 0,
+    created_at: s.created_at ?? '',
+  }));
 }
 export async function getSession(id: string): Promise<{ session: AISession; messages: ChatMessage[] }> {
   if (USE_MOCKS) {
