@@ -31,13 +31,16 @@ export function useAIChat() {
     const userMessage: ChatMessage = { id: `msg-user-${Date.now()}`, session_id: sessionId, role: 'user', content: trimmed, created_at: now };
     const assistantId = `msg-assistant-${Date.now()}`;
     setCurrentSessionId(sessionId);
-    setMessages((current) => [...current, userMessage, { id: assistantId, session_id: sessionId, role: 'assistant', content: '', created_at: now }]);
+    setMessages((current) => [...current, userMessage, { id: assistantId, session_id: sessionId, role: 'assistant', content: '', created_at: now, geogebra: null, is_refusal: false }]);
     setIsStreaming(true);
     await askAIStream(
       { session_id: currentSessionId ?? undefined, topic, question: trimmed, level },
-      (token) => setMessages((current) => current.map((message) => message.id === assistantId ? { ...message, content: message.content + token } : message)),
-      () => { setIsStreaming(false); void loadSessions(); },
-      (error) => { setIsStreaming(false); setMessages((current) => current.filter((message) => message.id !== assistantId)); toast.error(error.message || 'The tutor could not respond'); },
+      {
+        onToken: (token) => setMessages((current) => current.map((message) => message.id === assistantId ? { ...message, content: message.content + token } : message)),
+        onGeoGebra: (geo) => setMessages((current) => current.map((message) => message.id === assistantId ? { ...message, geogebra: geo } : message)),
+        onDone: ({ sessionId: newId }) => { setIsStreaming(false); if (newId) setCurrentSessionId(newId); void loadSessions(); },
+        onError: (error) => { setIsStreaming(false); setMessages((current) => current.filter((message) => message.id !== assistantId)); toast.error(error.message || 'The tutor could not respond'); },
+      },
     );
   }, [currentSessionId, isStreaming, loadSessions]);
 

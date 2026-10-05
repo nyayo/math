@@ -11,6 +11,8 @@ import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ModeTabs } from '@/components/pillar1/ModeTabs';
+import { GeoGebraSketch } from '@/components/pillar1/GeoGebraSketch';
+import { Lock } from 'lucide-react';
 import { cn, formatRelativeTime } from '@/lib/utils';
 
 const QUICK_PROMPTS = [
@@ -28,6 +30,20 @@ function ThinkingDots() {
       {[0, 1, 2].map((i) => (
         <motion.span key={i} animate={{ y: [0, -6, 0], opacity: [0.4, 1, 0.4] }} transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }} className="h-2 w-2 rounded-full bg-ink-400" />
       ))}
+    </div>
+  );
+}
+
+function RefusalBanner() {
+  return (
+    <div className="my-2 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-500/10">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-amber-200 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300">
+        <Lock className="h-3.5 w-3.5" />
+      </div>
+      <div className="flex-1">
+        <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">MathMaster only answers mathematics questions</p>
+        <p className="mt-0.5 text-xs text-amber-700 dark:text-amber-300">Try asking about algebra, geometry, trigonometry, calculus, statistics, or any other math topic.</p>
+      </div>
     </div>
   );
 }
@@ -133,7 +149,18 @@ export default function AITutor() {
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 text-sm font-bold text-white">M</div>
                     )}
                     <div className={cn('max-w-2xl', msg.role === 'user' ? 'rounded-2xl rounded-br-md bg-brand-500 px-4 py-3 text-sm text-white' : 'rounded-2xl rounded-bl-md border border-ink-200 bg-white px-4 py-3 dark:border-ink-700 dark:bg-ink-800')}>
-                      {msg.role === 'user' ? <p className="text-sm leading-6">{msg.content}</p> : msg.content === '' ? <ThinkingDots /> : <MarkdownRenderer content={msg.content} className="prose-sm" />}
+                      {msg.role === 'user' ? (
+                        <p className="text-sm leading-6">{msg.content}</p>
+                      ) : msg.content === '' ? (
+                        <ThinkingDots />
+                      ) : msg.is_refusal ? (
+                        <RefusalBanner />
+                      ) : (
+                        <>
+                          <MarkdownRenderer content={msg.content} className="prose-sm" />
+                          {msg.geogebra && <GeoGebraSketch payload={msg.geogebra} height={420} />}
+                        </>
+                      )}
                     </div>
                     {msg.role === 'user' && <Avatar className="h-9 w-9 shrink-0"><AvatarFallback>{initials}</AvatarFallback></Avatar>}
                   </div>

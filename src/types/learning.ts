@@ -88,7 +88,39 @@ export type ChatMessage = {
   role: 'user' | 'assistant';
   content: string;
   created_at: string;
+  geogebra?: GeoGebraPayload | null;
+  is_refusal?: boolean;
 };
+
+// ─── AI Tutor v2: strict mode + GeoGebra ──────────────────────────
+
+export type GeoGebraPayload = {
+  view: '2D' | '3D';
+  title: string;
+  commands: string[];
+  axes?: boolean;
+  grid?: boolean;
+  x_min?: number;
+  x_max?: number;
+  y_min?: number;
+  y_max?: number;
+  x_label?: string;
+  y_label?: string;
+  z_label?: string;
+};
+
+export type AITutorResponse = {
+  session_id: string | null;
+  topic: string;
+  level: string;
+  answer: string;
+  geogebra: GeoGebraPayload | null;
+  cached: boolean;
+  is_refusal: boolean;
+};
+
+export const REFUSAL_PHRASE =
+  "I'm sorry, but I can only help with mathematics.";
 
 export type AnalyticsSummary = {
   lessons_completed: number;
