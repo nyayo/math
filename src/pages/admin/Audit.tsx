@@ -11,19 +11,19 @@ import { AuditLogRow } from '@/components/school/AuditLogRow';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { fetchAuditLogs } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockAuditLogs } from '@/mocks/schoolMocks';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 export default function AdminAudit() {
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
   const [actionFilter, setActionFilter] = React.useState('');
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-audit', schoolId, actionFilter],
     queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockAuditLogs.length, results: mockAuditLogs }) : fetchAuditLogs(schoolId, { action: actionFilter || undefined })),
+    enabled: schoolId != null,
   });
 
   if (isLoading) return <AppShell><div className="mt-6"><LoadingSkeleton variant="hero" /></div></AppShell>;

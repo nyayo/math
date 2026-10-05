@@ -13,17 +13,16 @@ import { ClassCard } from '@/components/school/ClassCard';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { fetchClasses, createClass } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockClasses } from '@/mocks/schoolMocks';
 import { parseApiError } from '@/lib/api';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 const levels = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'];
 
 export default function Classes() {
   const navigate = useNavigate();
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = React.useState(false);
   const [name, setName] = React.useState('');
@@ -33,6 +32,7 @@ export default function Classes() {
   const { data: classes, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-classes', schoolId],
     queryFn: () => (USE_MOCKS ? Promise.resolve(mockClasses) : fetchClasses(schoolId)),
+    enabled: schoolId != null,
   });
 
   const handleCreate = async () => {

@@ -31,17 +31,19 @@ export async function fetchMySchools(): Promise<School[]> {
   }));
 }
 
-export async function fetchSchool(id: string): Promise<School> {
+export async function fetchSchool(id: string | null): Promise<School> {
+  if (!id) throw new Error('No school selected yet');
   if (USE_MOCKS) { await delay(200); return (await import('@/mocks/schoolMocks')).mockSchool; }
   return get<School>(`/api/schools/${id}/`);
 }
 
-export async function updateSchool(id: string, data: Partial<School>): Promise<School> {
+export async function updateSchool(id: string | null, data: Partial<School>): Promise<School> {
+  if (!USE_MOCKS && !id) throw new Error('School not loaded yet');
   if (USE_MOCKS) { await delay(400); return { ...(await import('@/mocks/schoolMocks')).mockSchool, ...data }; }
   return patch<School>(`/api/schools/${id}/`, data);
 }
 
-export async function fetchSchoolMembers(schoolId: string, params?: { role?: string; search?: string; page?: number }): Promise<{ count: number; results: Membership[] }> {
+export async function fetchSchoolMembers(schoolId: string | null, params?: { role?: string; search?: string; page?: number }): Promise<{ count: number; results: Membership[] }> {
   if (USE_MOCKS) {
     await delay(300);
     let results = [...(await import('@/mocks/schoolMocks')).mockMemberships];
@@ -55,28 +57,28 @@ export async function fetchSchoolMembers(schoolId: string, params?: { role?: str
   return get<{ count: number; results: Membership[] }>(`/api/schools/${schoolId}/members/`, { params });
 }
 
-export async function updateMember(schoolId: string, memberId: string, data: Partial<Membership>): Promise<Membership> {
+export async function updateMember(schoolId: string | null, memberId: string, data: Partial<Membership>): Promise<Membership> {
   if (USE_MOCKS) { await delay(300); const m = (await import('@/mocks/schoolMocks')).mockMemberships.find((x) => x.id === memberId)!; return { ...m, ...data }; }
   return patch<Membership>(`/api/schools/${schoolId}/members/${memberId}/`, data);
 }
 
-export async function removeMember(schoolId: string, memberId: string): Promise<void> {
+export async function removeMember(schoolId: string | null, memberId: string): Promise<void> {
   if (USE_MOCKS) { await delay(300); return; }
   await del(`/api/schools/${schoolId}/members/${memberId}/`);
 }
 
-export async function fetchMember(schoolId: string, memberId: string): Promise<Membership> {
+export async function fetchMember(schoolId: string | null, memberId: string): Promise<Membership> {
   if (USE_MOCKS) { await delay(200); return (await import('@/mocks/schoolMocks')).mockMemberships.find((m) => m.id === memberId) ?? (await import('@/mocks/schoolMocks')).mockMemberships[0]; }
   return get<Membership>(`/api/schools/${schoolId}/members/${memberId}/`);
 }
 
-export async function sendInvitations(schoolId: string, invitations: Array<{ email: string; role: string; class_level?: string; metadata?: Record<string, unknown> }>): Promise<Invitation[]> {
+export async function sendInvitations(schoolId: string | null, invitations: Array<{ email: string; role: string; class_level?: string; metadata?: Record<string, unknown> }>): Promise<Invitation[]> {
   if (USE_MOCKS) {
     await delay(500);
     const mock = await import('@/mocks/schoolMocks');
     return invitations.map((inv, i) => ({
       id: `inv-new-${Date.now()}-${i}`,
-      school: schoolId,
+      school: schoolId ?? 'mock-school',
       email: inv.email,
       role: inv.role as Invitation['role'],
       class_level: inv.class_level ?? null,
@@ -91,7 +93,7 @@ export async function sendInvitations(schoolId: string, invitations: Array<{ ema
   return post<Invitation[]>(`/api/schools/${schoolId}/invitations/bulk/`, { invitations });
 }
 
-export async function fetchInvitations(schoolId: string, params?: { status?: string }): Promise<{ count: number; results: Invitation[] }> {
+export async function fetchInvitations(schoolId: string | null, params?: { status?: string }): Promise<{ count: number; results: Invitation[] }> {
   if (USE_MOCKS) {
     await delay(200);
     let results = [...(await import('@/mocks/schoolMocks')).mockInvitations];
@@ -101,62 +103,62 @@ export async function fetchInvitations(schoolId: string, params?: { status?: str
   return get<{ count: number; results: Invitation[] }>(`/api/schools/${schoolId}/invitations/`, { params });
 }
 
-export async function revokeInvitation(schoolId: string, invitationId: string): Promise<void> {
+export async function revokeInvitation(schoolId: string | null, invitationId: string): Promise<void> {
   if (USE_MOCKS) { await delay(200); return; }
   await del(`/api/schools/${schoolId}/invitations/${invitationId}/`);
 }
 
-export async function resendInvitation(schoolId: string, invitationId: string): Promise<Invitation> {
+export async function resendInvitation(schoolId: string | null, invitationId: string): Promise<Invitation> {
   if (USE_MOCKS) { await delay(300); return (await import('@/mocks/schoolMocks')).mockInvitations[0]; }
   return post<Invitation>(`/api/schools/${schoolId}/invitations/${invitationId}/resend/`);
 }
 
-export async function fetchClasses(schoolId: string): Promise<SchoolClass[]> {
+export async function fetchClasses(schoolId: string | null): Promise<SchoolClass[]> {
   if (USE_MOCKS) { await delay(300); return (await import('@/mocks/schoolMocks')).mockClasses; }
   return get<SchoolClass[]>(`/api/schools/${schoolId}/classes/`);
 }
 
-export async function createClass(schoolId: string, data: Partial<SchoolClass>): Promise<SchoolClass> {
-  if (USE_MOCKS) { await delay(400); return { id: `c-${Date.now()}`, school: schoolId, name: data.name ?? 'New Class', level: data.level ?? 'S1', class_teacher_name: null, academic_year: '2026', student_count: 0, created_at: new Date().toISOString() }; }
+export async function createClass(schoolId: string | null, data: Partial<SchoolClass>): Promise<SchoolClass> {
+  if (USE_MOCKS) { await delay(400); return { id: `c-${Date.now()}`, school: schoolId ?? 'mock-school', name: data.name ?? 'New Class', level: data.level ?? 'S1', class_teacher_name: null, academic_year: '2026', student_count: 0, created_at: new Date().toISOString() }; }
   return post<SchoolClass>(`/api/schools/${schoolId}/classes/`, data);
 }
 
-export async function updateClass(schoolId: string, classId: string, data: Partial<SchoolClass>): Promise<SchoolClass> {
+export async function updateClass(schoolId: string | null, classId: string, data: Partial<SchoolClass>): Promise<SchoolClass> {
   if (USE_MOCKS) { await delay(300); const c = (await import('@/mocks/schoolMocks')).mockClasses.find((x) => x.id === classId)!; return { ...c, ...data }; }
   return patch<SchoolClass>(`/api/schools/${schoolId}/classes/${classId}/`, data);
 }
 
-export async function deleteClass(schoolId: string, classId: string): Promise<void> {
+export async function deleteClass(schoolId: string | null, classId: string): Promise<void> {
   if (USE_MOCKS) { await delay(300); return; }
   await del(`/api/schools/${schoolId}/classes/${classId}/`);
 }
 
-export async function assignClassTeacher(schoolId: string, classId: string, teacherId: string): Promise<SchoolClass> {
+export async function assignClassTeacher(schoolId: string | null, classId: string, teacherId: string): Promise<SchoolClass> {
   if (USE_MOCKS) { await delay(300); return (await import('@/mocks/schoolMocks')).mockClasses[0]; }
   return post<SchoolClass>(`/api/schools/${schoolId}/classes/${classId}/assign-teacher/`, { teacher_id: teacherId });
 }
 
-export async function bulkImportStudents(schoolId: string, file: File): Promise<{ created: number; errors: Array<{ row: number; message: string }> }> {
+export async function bulkImportStudents(schoolId: string | null, file: File): Promise<{ created: number; errors: Array<{ row: number; message: string }> }> {
   if (USE_MOCKS) { await delay(1500); return { created: 12, errors: [{ row: 5, message: 'Invalid email format' }] }; }
   return uploadFile(`/api/schools/${schoolId}/members/bulk-import/`, file, {}) as Promise<{ created: number; errors: Array<{ row: number; message: string }> }>;
 }
 
-export async function generateClassCode(schoolId: string): Promise<{ code: string; url: string }> {
+export async function generateClassCode(schoolId: string | null): Promise<{ code: string; url: string }> {
   if (USE_MOCKS) { await delay(300); return { code: 'KSS-2026-ABC123', url: `https://mathmaster.app/join?code=KSS-2026-ABC123` }; }
   return post<{ code: string; url: string }>(`/api/schools/${schoolId}/class-code/generate/`);
 }
 
-export async function fetchClassCode(schoolId: string): Promise<{ code: string; url: string; active: boolean }> {
+export async function fetchClassCode(schoolId: string | null): Promise<{ code: string; url: string; active: boolean }> {
   if (USE_MOCKS) { await delay(200); return { code: 'KSS-2026-ABC123', url: `https://mathmaster.app/join?code=KSS-2026-ABC123`, active: true }; }
   return get<{ code: string; url: string; active: boolean }>(`/api/schools/${schoolId}/class-code/`);
 }
 
-export async function fetchSubscription(schoolId: string): Promise<Subscription> {
+export async function fetchSubscription(schoolId: string | null): Promise<Subscription> {
   if (USE_MOCKS) { await delay(200); return (await import('@/mocks/schoolMocks')).mockSubscription; }
   return get<Subscription>(`/api/schools/${schoolId}/subscription/`);
 }
 
-export async function fetchInvoices(schoolId: string): Promise<Invoice[]> {
+export async function fetchInvoices(schoolId: string | null): Promise<Invoice[]> {
   if (USE_MOCKS) { await delay(200); return (await import('@/mocks/schoolMocks')).mockInvoices; }
   const data = await get<unknown>(`/api/schools/${schoolId}/invoices/`);
   const items = Array.isArray(data) ? data : (data as { results?: unknown[] })?.results ?? [];
@@ -173,7 +175,7 @@ export async function fetchInvoices(schoolId: string): Promise<Invoice[]> {
   }));
 }
 
-export async function fetchUsage(schoolId: string): Promise<UsageMetric[]> {
+export async function fetchUsage(schoolId: string | null): Promise<UsageMetric[]> {
   if (USE_MOCKS) { await delay(200); return (await import('@/mocks/schoolMocks')).mockUsage; }
   const data = await get<unknown[]>(`/api/schools/${schoolId}/usage/`);
   return (Array.isArray(data) ? data : []).map((u: any) => ({
@@ -190,22 +192,24 @@ export async function fetchPlans(): Promise<PlanInfo[]> {
   return get<PlanInfo[]>('/api/billing/plans/');
 }
 
-export async function createCheckoutSession(schoolId: string, planId: string, cycle: 'monthly' | 'annual'): Promise<{ url: string }> {
+export async function createCheckoutSession(schoolId: string | null, planId: string, cycle: 'monthly' | 'annual'): Promise<{ url: string }> {
+  if (!USE_MOCKS && !schoolId) throw new Error('School not loaded yet');
   if (USE_MOCKS) { await delay(500); return { url: 'https://billing.stripe.com/mock-checkout' }; }
   return post<{ url: string }>('/api/billing/checkout/', { school_id: schoolId, plan_id: planId, billing_cycle: cycle });
 }
 
-export async function openBillingPortal(schoolId: string): Promise<{ url: string }> {
+export async function openBillingPortal(schoolId: string | null): Promise<{ url: string }> {
+  if (!USE_MOCKS && !schoolId) throw new Error('School not loaded yet');
   if (USE_MOCKS) { await delay(300); return { url: 'https://billing.stripe.com/mock-portal' }; }
   return post<{ url: string }>('/api/billing/portal/', { school_id: schoolId });
 }
 
-export async function cancelSubscription(schoolId: string): Promise<{ status: string }> {
+export async function cancelSubscription(schoolId: string | null): Promise<{ status: string }> {
   if (USE_MOCKS) { await delay(400); return { status: 'canceled' }; }
   return post<{ status: string }>(`/api/schools/${schoolId}/subscription/cancel/`);
 }
 
-export async function fetchAuditLogs(schoolId: string, params?: { page?: number; actor?: string; action?: string }): Promise<{ count: number; results: AuditLog[] }> {
+export async function fetchAuditLogs(schoolId: string | null, params?: { page?: number; actor?: string; action?: string }): Promise<{ count: number; results: AuditLog[] }> {
   if (USE_MOCKS) {
     await delay(300);
     let results = [...(await import('@/mocks/schoolMocks')).mockAuditLogs];

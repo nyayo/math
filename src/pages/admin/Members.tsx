@@ -14,18 +14,17 @@ import { InvitationCard } from '@/components/school/InvitationCard';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { fetchSchoolMembers, fetchInvitations, revokeInvitation, resendInvitation, removeMember } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockMemberships, mockInvitations } from '@/mocks/schoolMocks';
 import { parseApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 const roleFilters = ['all', 'owner', 'admin', 'teacher', 'student', 'parent'] as const;
 
 export default function Members() {
   const navigate = useNavigate();
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
   const [search, setSearch] = React.useState('');
   const [roleFilter, setRoleFilter] = React.useState<string>('all');
   const [tab, setTab] = React.useState('active');
@@ -33,11 +32,13 @@ export default function Members() {
   const { data: membersData, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-members', schoolId, roleFilter, search],
     queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockMemberships.length, results: mockMemberships }) : fetchSchoolMembers(schoolId, { role: roleFilter, search })),
+    enabled: schoolId != null,
   });
 
   const { data: invitationsData } = useQuery({
     queryKey: ['admin-invitations', schoolId],
     queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockInvitations.length, results: mockInvitations }) : fetchInvitations(schoolId)),
+    enabled: schoolId != null,
   });
 
   const handleResend = async (id: string) => {

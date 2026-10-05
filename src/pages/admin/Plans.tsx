@@ -10,22 +10,22 @@ import { PlanCard } from '@/components/school/PlanCard';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { fetchPlans, createCheckoutSession } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockPlans } from '@/mocks/schoolMocks';
 import { parseApiError } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 export default function Plans() {
   const navigate = useNavigate();
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
   const [cycle, setCycle] = React.useState<'monthly' | 'annual'>('annual');
 
   const { data: plans, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-plans'],
     queryFn: () => (USE_MOCKS ? Promise.resolve(mockPlans) : fetchPlans()),
+    enabled: schoolId != null,
   });
 
   const handleChoose = async (planId: string) => {

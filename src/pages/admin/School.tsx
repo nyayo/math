@@ -10,15 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { fetchSchool, updateSchool } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockSchool } from '@/mocks/schoolMocks';
 import { parseApiError } from '@/lib/api';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 export default function SchoolProfile() {
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
   const queryClient = useQueryClient();
   const [form, setForm] = React.useState<{ name: string; address: string; contact_email: string; contact_phone: string; school_type: 'primary' | 'secondary' | 'university' | 'tutoring'; primary_color: string }>({ name: '', address: '', contact_email: '', contact_phone: '', school_type: 'secondary', primary_color: '#006591' });
   const [saving, setSaving] = React.useState(false);
@@ -26,6 +25,7 @@ export default function SchoolProfile() {
   const { data: school, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-school-profile', schoolId],
     queryFn: () => (USE_MOCKS ? Promise.resolve(mockSchool) : fetchSchool(schoolId)),
+    enabled: schoolId != null,
   });
 
   React.useEffect(() => {
@@ -35,7 +35,7 @@ export default function SchoolProfile() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      if (!USE_MOCKS) await updateSchool(schoolId, form);
+      if (!USE_MOCKS) { if (!schoolId) throw new Error('School not loaded'); await updateSchool(schoolId, form); }
       toast.success('School profile updated');
       void queryClient.invalidateQueries({ queryKey: ['admin-school-profile', schoolId] });
     } catch (err) { toast.error(parseApiError(err)); }

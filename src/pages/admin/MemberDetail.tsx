@@ -11,17 +11,16 @@ import { RoleChip } from '@/components/school/RoleChip';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { fetchMember } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockMemberships } from '@/mocks/schoolMocks';
 import { formatRelativeTime } from '@/lib/utils';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 export default function MemberDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
 
   const { data: member, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-member', id],

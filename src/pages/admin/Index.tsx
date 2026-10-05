@@ -13,8 +13,8 @@ import { ErrorState } from '@/components/shared/ErrorState';
 import { AuditLogRow } from '@/components/school/AuditLogRow';
 import { UsageMeter } from '@/components/school/UsageMeter';
 import { fetchAuditLogs, fetchUsage, fetchSchool } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockSchool, mockUsage, mockAuditLogs } from '@/mocks/schoolMocks';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
@@ -29,22 +29,24 @@ const onboardingSteps = [
 ];
 
 export default function AdminDashboard() {
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
 
   const { data: school, isLoading } = useQuery({
     queryKey: ['admin-school', schoolId],
     queryFn: () => (USE_MOCKS ? Promise.resolve(mockSchool) : fetchSchool(schoolId)),
+    enabled: schoolId != null,
   });
 
   const { data: usage } = useQuery({
     queryKey: ['admin-usage', schoolId],
     queryFn: () => (USE_MOCKS ? Promise.resolve(mockUsage) : fetchUsage(schoolId)),
+    enabled: schoolId != null,
   });
 
   const { data: auditData } = useQuery({
     queryKey: ['admin-audit-recent', schoolId],
     queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockAuditLogs.length, results: mockAuditLogs }) : fetchAuditLogs(schoolId)),
+    enabled: schoolId != null,
   });
 
   if (isLoading) return <AppShell><div className="mt-6"><LoadingSkeleton variant="hero" /></div></AppShell>;

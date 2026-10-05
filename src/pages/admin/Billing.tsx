@@ -12,17 +12,16 @@ import { InvoiceRow } from '@/components/school/InvoiceRow';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { fetchSubscription, fetchUsage, fetchInvoices, openBillingPortal, cancelSubscription } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockSubscription, mockUsage, mockInvoices } from '@/mocks/schoolMocks';
 import { parseApiError } from '@/lib/api';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 const planLabels: Record<string, string> = { free: 'Free', starter: 'Starter', school: 'School', district: 'District', enterprise: 'Enterprise' };
 
 export default function Billing() {
   const navigate = useNavigate();
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
   const queryClient = useQueryClient();
 
   const { data: subscription, isLoading } = useQuery({ queryKey: ['admin-subscription', schoolId], queryFn: () => (USE_MOCKS ? Promise.resolve(mockSubscription) : fetchSubscription(schoolId)) });

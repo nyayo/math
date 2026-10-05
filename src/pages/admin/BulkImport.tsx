@@ -8,13 +8,12 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { UploadProgressModal } from '@/components/pillar1/UploadProgressModal';
 import { bulkImportStudents, generateClassCode } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { parseApiError } from '@/lib/api';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 export default function BulkImport() {
   const navigate = useNavigate();
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
   const [file, setFile] = React.useState<File | null>(null);
   const [uploading, setUploading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);

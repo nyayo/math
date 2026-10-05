@@ -9,15 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Input, Label } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { sendInvitations } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { parseApiError } from '@/lib/api';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const classLevels = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6'];
 
 export default function InviteMember() {
   const navigate = useNavigate();
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
   const [email, setEmail] = React.useState('');
   const [role, setRole] = React.useState('teacher');
   const [classLevel, setClassLevel] = React.useState('');

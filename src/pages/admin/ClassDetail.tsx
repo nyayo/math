@@ -11,20 +11,20 @@ import { RoleChip } from '@/components/school/RoleChip';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
 import { fetchClasses } from '@/services/schools';
-import { useSchoolStore } from '@/stores/schoolStore';
 import { mockClasses, mockMemberships } from '@/mocks/schoolMocks';
+import { useSchoolId } from '@/hooks/useSchoolId';
 
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 export default function ClassDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentSchool } = useSchoolStore();
-  const schoolId = currentSchool?.id ?? 'school-1';
+  const schoolId = useSchoolId();
 
   const { data: classes, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-classes-detail', schoolId],
     queryFn: () => (USE_MOCKS ? Promise.resolve(mockClasses) : fetchClasses(schoolId)),
+    enabled: schoolId != null,
   });
 
   const cls = classes?.find((c) => c.id === id);
