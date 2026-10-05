@@ -45,7 +45,7 @@ export default function AdminDashboard() {
 
   const { data: auditData } = useQuery({
     queryKey: ['admin-audit-recent', schoolId],
-    queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockAuditLogs.length, results: mockAuditLogs }) : fetchAuditLogs(schoolId)),
+    enabled: schoolId != null, queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockAuditLogs.length, results: mockAuditLogs }) : fetchAuditLogs(schoolId)),
     enabled: schoolId != null,
   });
 

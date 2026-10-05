@@ -24,9 +24,9 @@ export default function Billing() {
   const schoolId = useSchoolId();
   const queryClient = useQueryClient();
 
-  const { data: subscription, isLoading } = useQuery({ queryKey: ['admin-subscription', schoolId], queryFn: () => (USE_MOCKS ? Promise.resolve(mockSubscription) : fetchSubscription(schoolId)) });
-  const { data: usage } = useQuery({ queryKey: ['admin-usage-billing', schoolId], queryFn: () => (USE_MOCKS ? Promise.resolve(mockUsage) : fetchUsage(schoolId)) });
-  const { data: invoices } = useQuery({ queryKey: ['admin-invoices', schoolId], queryFn: () => (USE_MOCKS ? Promise.resolve(mockInvoices) : fetchInvoices(schoolId)) });
+  const { data: subscription, isLoading } = useQuery({ queryKey: ['admin-subscription', schoolId], enabled: schoolId != null, queryFn: () => (USE_MOCKS ? Promise.resolve(mockSubscription) : fetchSubscription(schoolId)) });
+  const { data: usage } = useQuery({ queryKey: ['admin-usage-billing', schoolId], enabled: schoolId != null, queryFn: () => (USE_MOCKS ? Promise.resolve(mockUsage) : fetchUsage(schoolId)) });
+  const { data: invoices } = useQuery({ queryKey: ['admin-invoices', schoolId], enabled: schoolId != null, queryFn: () => (USE_MOCKS ? Promise.resolve(mockInvoices) : fetchInvoices(schoolId)) });
 
   const handlePortal = async () => {
     try { const res = await openBillingPortal(schoolId); if (res.url && !USE_MOCKS) window.open(res.url, '_blank'); else toast.success('Opening billing portal...'); } catch (err) { toast.error(parseApiError(err)); }

@@ -22,7 +22,7 @@ export default function AdminAudit() {
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-audit', schoolId, actionFilter],
-    queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockAuditLogs.length, results: mockAuditLogs }) : fetchAuditLogs(schoolId, { action: actionFilter || undefined })),
+    enabled: schoolId != null, queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockAuditLogs.length, results: mockAuditLogs }) : fetchAuditLogs(schoolId, { action: actionFilter || undefined })),
     enabled: schoolId != null,
   });
 
