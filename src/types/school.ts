@@ -16,6 +16,8 @@ export type School = {
   created_at: string;
   student_count: number;
   teacher_count: number;
+  /** Caller's membership in this school — present on /api/schools/me/ responses. */
+  membership?: Membership | null;
 };
 
 // ─── Membership (user × school × role) ──────────────────────────

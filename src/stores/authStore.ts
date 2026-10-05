@@ -110,11 +110,34 @@ export const useAuthStore = create<AuthState>()(
         const { accessToken } = get();
         if (!accessToken) {
           set({ user: null, isAuthenticated: false, isLoading: false });
+          useSchoolStore.getState().clear();
           return;
         }
         try {
           const profile = await apiGet<AuthUser>('/api/accounts/profile/');
           set({ user: profile, isAuthenticated: true, isLoading: false });
+          // Bootstrap the school context from the backend. The persisted
+          // localStorage school may be a stale mock (e.g. 'school-1') that
+          // the real API 404s on — always refresh from the server.
+          const { fetchMySchools } = await import('@/services/schools');
+          const schools = await fetchMySchools();
+          const schoolStore = useSchoolStore.getState();
+          if (schools.length === 0) {
+            // Fresh user with no school yet — drop any stale persisted school
+            // so pages don't fire requests against a nonexistent id.
+            schoolStore.clear();
+          } else {
+            const memberships = schools
+              .filter((s) => s.membership)
+              .map((s) => ({ ...s.membership!, school: String(s.id) }));
+            const currentId = String(schoolStore.currentSchool?.id ?? '');
+            const persistedStillValid = memberships.some((m) => m.school === currentId);
+            const active = persistedStillValid ? currentId : String(schools[0].id);
+            const school = schools.find((s) => String(s.id) === active)!;
+            const membership = memberships.find((m) => m.school === active) ?? null;
+            schoolStore.setMemberships(memberships);
+            if (membership) schoolStore.setCurrentSchool(school, membership);
+          }
         } catch {
           set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false, isLoading: false });
         }

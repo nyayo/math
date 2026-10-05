@@ -6,7 +6,29 @@ const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function fetchMySchools(): Promise<School[]> {
   if (USE_MOCKS) { await delay(300); return [((await import('@/mocks/schoolMocks')).mockSchool)]; }
-  return get<School[]>('/api/schools/me/');
+  // GET /api/schools/me/ returns each school enriched with the caller's
+  // `membership` (role etc.) — exactly the School shape the store expects
+  // plus the nested membership used to bootstrap the school context.
+  const data = await get<unknown[]>('/api/schools/me/');
+  return (Array.isArray(data) ? data : []).map((s: any) => ({
+    id: String(s.id),
+    name: s.name ?? '',
+    slug: s.slug ?? '',
+    logo_url: s.logo_url ?? null,
+    primary_color: s.primary_color ?? '#0EA5E9',
+    contact_email: s.contact_email ?? '',
+    contact_phone: s.contact_phone ?? '',
+    address: s.address ?? '',
+    school_type: s.school_type ?? 'secondary',
+    plan: s.plan ?? 'free',
+    status: s.status ?? 'active',
+    trial_ends_at: s.trial_ends_at ?? null,
+    current_period_end: s.current_period_end ?? null,
+    created_at: s.created_at ?? '',
+    student_count: s.student_count ?? 0,
+    teacher_count: s.teacher_count ?? 0,
+    membership: s.membership ?? null,
+  }));
 }
 
 export async function fetchSchool(id: string): Promise<School> {
