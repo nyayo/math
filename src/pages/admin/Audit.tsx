@@ -23,7 +23,6 @@ export default function AdminAudit() {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-audit', schoolId, actionFilter],
     enabled: schoolId != null, queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockAuditLogs.length, results: mockAuditLogs }) : fetchAuditLogs(schoolId, { action: actionFilter || undefined })),
-    enabled: schoolId != null,
   });
 
   if (isLoading) return <AppShell><div className="mt-6"><LoadingSkeleton variant="hero" /></div></AppShell>;
