@@ -34,7 +34,18 @@ export function fetchDocumentChunk(id: string, chunkId: string): Promise<Documen
 }
 
 export function fetchDocumentSessions(id: string): Promise<DocumentSession[]> {
-  return get<DocumentSession[]>(`/api/documents/${id}/sessions/`);
+  return get<unknown>(`/api/documents/${id}/sessions/`).then((data) => {
+    // Global DRF pagination wraps list endpoints as {count, next, results}.
+    const items = Array.isArray(data) ? data : (data as { results?: unknown[] })?.results ?? [];
+    return (items as any[]).map((s) => ({
+      id: String(s.id),
+      document_id: String(s.document ?? s.document_id ?? id),
+      // The backend chat session is titled with the first question.
+      question: s.question ?? s.title ?? '',
+      message_count: s.message_count ?? (Array.isArray(s.messages) ? s.messages.length : 0),
+      created_at: s.created_at ?? '',
+    }));
+  });
 }
 
 export function fetchDocumentSession(id: string, sessionId: string): Promise<DocumentSessionDetail> {
