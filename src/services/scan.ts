@@ -5,7 +5,7 @@ export function submitScan(
   file: File,
   onProgress?: (percent: number) => void,
 ): Promise<ScanJob> {
-  return uploadFile('/api/scan/solve/', file, {}, onProgress) as Promise<ScanJob>;
+  return uploadFile('/api/scan/solve/', file, {}, onProgress, 'image') as Promise<ScanJob>;
 }
 
 export function fetchScanHistory(page = 1): Promise<{ count: number; next: string | null; previous: string | null; results: ScanJob[] }> {

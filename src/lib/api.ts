@@ -115,11 +115,12 @@ export function uploadFile(
   file: File,
   fields: Record<string, string>,
   onProgress?: (percent: number) => void,
+  fileField = 'file',
 ): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append(fileField, file);
     for (const [key, value] of Object.entries(fields)) {
       formData.append(key, value);
     }
