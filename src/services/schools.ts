@@ -136,12 +136,31 @@ export async function fetchSubscription(schoolId: string): Promise<Subscription>
 
 export async function fetchInvoices(schoolId: string): Promise<Invoice[]> {
   if (USE_MOCKS) { await delay(200); return (await import('@/mocks/schoolMocks')).mockInvoices; }
-  return get<Invoice[]>(`/api/schools/${schoolId}/invoices/`);
+  const data = await get<unknown>(`/api/schools/${schoolId}/invoices/`);
+  const items = Array.isArray(data) ? data : (data as { results?: unknown[] })?.results ?? [];
+  return (items as any[]).map((inv) => ({
+    id: String(inv.id),
+    amount: Number(inv.amount),
+    currency: inv.currency ?? 'USD',
+    status: inv.status ?? 'draft',
+    period_start: inv.period_start ?? '',
+    period_end: inv.period_end ?? '',
+    paid_at: inv.paid_at ?? null,
+    pdf_url: inv.pdf_url ?? null,
+    created_at: inv.created_at ?? '',
+  }));
 }
 
 export async function fetchUsage(schoolId: string): Promise<UsageMetric[]> {
   if (USE_MOCKS) { await delay(200); return (await import('@/mocks/schoolMocks')).mockUsage; }
-  return get<UsageMetric[]>(`/api/schools/${schoolId}/usage/`);
+  const data = await get<unknown[]>(`/api/schools/${schoolId}/usage/`);
+  return (Array.isArray(data) ? data : []).map((u: any) => ({
+    metric: u.metric,
+    label: u.label ?? u.metric,
+    used: u.used ?? 0,
+    limit: u.limit ?? null,
+    percent: u.limit ? Math.round((u.used / u.limit) * 100) : 0,
+  }));
 }
 
 export async function fetchPlans(): Promise<PlanInfo[]> {
