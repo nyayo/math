@@ -32,7 +32,6 @@ export default function Members() {
   const { data: membersData, isLoading, isError, refetch } = useQuery({
     queryKey: ['admin-members', schoolId, roleFilter, search],
     enabled: schoolId != null, queryFn: () => (USE_MOCKS ? Promise.resolve({ count: mockMemberships.length, results: mockMemberships }) : fetchSchoolMembers(schoolId, { role: roleFilter, search })),
-    enabled: schoolId != null,
   });
 
   const { data: invitationsData } = useQuery({
