@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, FileText, Trash2, Send, History, MessageSquare } from 'lucide-react';
+import { ArrowLeft, FileText, Trash2, Send, History, MessageSquare, ChevronRight } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { AppShell } from '@/components/layout/AppShell';
@@ -14,7 +14,7 @@ import { QuickPromptChips } from '@/components/pillar1/QuickPromptChips';
 import { CitationChip } from '@/components/pillar1/CitationChip';
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton';
 import { ErrorState } from '@/components/shared/ErrorState';
-import { fetchDocument, deleteDocument, fetchDocumentSessions, askDocumentStream } from '@/services/documents';
+import { fetchDocument, deleteDocument, fetchDocumentSessions, fetchDocumentSession, askDocumentStream } from '@/services/documents';
 import { mockDocuments } from '@/mocks/pillar1Mocks';
 import { parseApiError } from '@/lib/api';
 import { cn, formatRelativeTime } from '@/lib/utils';
@@ -38,6 +38,7 @@ export default function DocumentDetail() {
   const [messages, setMessages] = React.useState<ChatMsg[]>([]);
   const [isStreaming, setIsStreaming] = React.useState(false);
   const [sessionId, setSessionId] = React.useState<string | null>(null);
+  const [loadingSession, setLoadingSession] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   const { data: doc, isLoading, isError, refetch } = useQuery({
@@ -82,6 +83,30 @@ export default function DocumentDetail() {
       toast.success('Document deleted');
       navigate('/documents');
     } catch (err) { toast.error(parseApiError(err)); }
+  };
+
+  // Open a past session: load its messages into the Ask tab so the user can
+  // read (and continue) the earlier conversation.
+  const handleOpenSession = async (sid: string) => {
+    if (USE_MOCKS || !id) { setMode('ask'); return; }
+    setLoadingSession(true);
+    try {
+      const detail = await fetchDocumentSession(id, sid);
+      setSessionId(sid);
+      setMessages(
+        (detail.messages || []).map((m) => ({
+          id: String(m.id),
+          role: m.role,
+          content: m.content,
+          citations: m.citations ?? undefined,
+        })),
+      );
+      setMode('ask');
+    } catch (err) {
+      toast.error(parseApiError(err));
+    } finally {
+      setLoadingSession(false);
+    }
   };
 
   if (isLoading) return <AppShell><div className="mt-6"><LoadingSkeleton variant="hero" /></div></AppShell>;
@@ -137,14 +162,19 @@ export default function DocumentDetail() {
 
         <TabsContent value="sessions">
           <div className="space-y-3">
-            {(sessions ?? []).length === 0 ? (
+            {(loadingSession) ? (
+              <Card className="p-8 text-center"><p className="text-sm text-ink-500">Loading conversation…</p></Card>
+            ) : (sessions ?? []).length === 0 ? (
               <Card className="p-8 text-center"><History className="mx-auto h-8 w-8 text-ink-300" /><p className="mt-3 text-sm text-ink-500">No past sessions for this document.</p></Card>
             ) : (
               (sessions ?? []).map((s, i) => (
                 <motion.div key={s.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                   <Card hover className="flex items-center gap-4 p-4">
-                    <MessageSquare className="h-5 w-5 text-ink-400" />
-                    <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-ink-800 dark:text-ink-100">{s.question}</p><p className="mt-0.5 text-xs text-ink-400">{formatRelativeTime(s.created_at)} · {s.message_count} messages</p></div>
+                    <button onClick={() => void handleOpenSession(s.id)} className="flex min-w-0 flex-1 items-center gap-4 text-left" aria-label={`Open conversation: ${s.question}`}>
+                      <MessageSquare className="h-5 w-5 shrink-0 text-ink-400" />
+                      <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-ink-800 dark:text-ink-100">{s.question}</p><p className="mt-0.5 text-xs text-ink-400">{formatRelativeTime(s.created_at)} · {s.message_count} messages</p></div>
+                      <ChevronRight className="h-4 w-4 shrink-0 text-ink-300" />
+                    </button>
                   </Card>
                 </motion.div>
               ))

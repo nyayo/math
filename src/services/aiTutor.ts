@@ -209,7 +209,7 @@ export async function askAIStream(
     if (!res.ok || !res.body) throw new Error('Stream request failed');
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = '', fullText = '', sessionId = params.session_id ?? '', isRefusal = false, geogebra: GeoGebraPayload | null = null;
+    let buffer = '', fullText = '', sessionId = params.session_id ?? '', isRefusal = false, geogebra: GeoGebraPayload | null = null, emittedLen = 0;
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -230,7 +230,18 @@ export async function askAIStream(
           if (!geogebra && parsed.geogebra) { geogebra = parsed.geogebra; if (geogebra) onGeoGebra?.(geogebra); }
         }
         else if (eventName === 'error') { onError?.(new Error(parsed.error?.message || 'AI tutor error')); return; }
-        else if (parsed.token) { fullText += parsed.token; onToken(parsed.token); }
+        else if (parsed.token) {
+          fullText += parsed.token;
+          // Suppress the raw [GEOGEBRA_DATA: ...] tag while streaming: the
+          // backend emits it as trailing tokens and the sketch arrives
+          // separately via the geogebra event, so the tag must never render.
+          const tagIdx = fullText.indexOf('[GEOGEBRA_DATA');
+          const visibleLen = tagIdx === -1 ? fullText.length : tagIdx;
+          if (visibleLen > emittedLen) {
+            onToken(fullText.slice(emittedLen, visibleLen));
+            emittedLen = visibleLen;
+          }
+        }
       }
     }
     if (!geogebra) {
