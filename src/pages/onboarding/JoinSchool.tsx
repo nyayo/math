@@ -7,19 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Input, Label } from '@/components/ui/input';
 import { joinSchoolByCode } from '@/services/schools';
 import { parseApiError } from '@/lib/api';
+import { useAuthStore } from '@/stores/authStore';
+import { homePathFor } from '@/lib/permissions';
 
 export default function JoinSchool() {
   const navigate = useNavigate();
   const [code, setCode] = React.useState('');
   const [joining, setJoining] = React.useState(false);
+  const user = useAuthStore((state) => state.user);
 
   const handleJoin = async () => {
     if (!code.trim()) { toast.error('Enter a class code'); return; }
     setJoining(true);
     try {
       await joinSchoolByCode(code);
+      await useAuthStore.getState().refreshProfile(); // pick up the new school + membership
       toast.success('Joined school successfully!');
-      navigate('/dashboard');
+      navigate(homePathFor(user));
     } catch (err) { toast.error(parseApiError(err)); }
     setJoining(false);
   };
@@ -34,7 +38,7 @@ export default function JoinSchool() {
         <p className="mt-2 text-center text-sm text-ink-500">Enter the class code provided by your school administrator.</p>
         <div className="mt-6 space-y-4">
           <div><Label htmlFor="code">Class code</Label><Input id="code" value={code} onChange={(e) => setCode(e.target.value)} className="mt-2" placeholder="e.g. KSS-2026-ABC123" /></div>
-          <Button variant="gradient" className="w-full" onClick={handleJoin} loading={joining}>Join school <ArrowRight className="ml-2 h-4 w-4" /></Button>
+          <Button variant="primary" className="w-full" onClick={handleJoin} loading={joining}>Join school <ArrowRight className="ml-2 h-4 w-4" /></Button>
           <Button variant="ghost" className="w-full" onClick={() => navigate('/login')}>Back to login</Button>
         </div>
       </Card>

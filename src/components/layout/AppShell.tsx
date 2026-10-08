@@ -31,6 +31,7 @@ import { useSchoolStore } from '@/stores/schoolStore';
 import { useSearchStore } from '@/stores/searchStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { cn } from '@/lib/utils';
+import { canManageSchool } from '@/lib/permissions';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -84,7 +85,7 @@ function Logo({ collapsed = false }: { collapsed?: boolean }) {
   const home = user?.role === 'teacher' ? '/teacher' : '/dashboard';
   return (
     <Link to={home} className={cn('flex items-center gap-2.5', collapsed && 'justify-center')} aria-label="MathMaster home">
-      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 text-lg font-bold text-white shadow-glow-brand">
+      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-lg font-bold text-white">
         M
         <span className="absolute -right-1 -top-1 text-[10px] font-bold text-brand-600">π</span>
       </div>
@@ -145,7 +146,7 @@ function SidebarContent({
   const school = useSchoolStore((s) => s.currentSchool);
 
   const mainNav = user?.role === 'teacher' ? teacherNav : studentNav;
-  const canAdminister = membership?.role === 'owner' || membership?.role === 'admin';
+  const canAdminister = canManageSchool(user, membership);
   const initials = (user?.first_name || user?.username || 'M').slice(0, 1).toUpperCase();
   const profileHref = user?.role === 'teacher' ? '/teacher/profile' : '/profile';
   const displayRole = roleLabel(membership?.role ?? user?.role);
