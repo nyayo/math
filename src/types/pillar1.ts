@@ -107,8 +107,17 @@ export type DocumentSession = {
 };
 
 export type DocumentSessionDetail = {
-  session: DocumentSession;
-  messages: { id: string; role: 'user' | 'assistant'; content: string; citations?: Citation[]; created_at: string }[];
+  id: number;
+  title: string;
+  question: string;
+  message_count: number;
+  messages: {
+    id: number;
+    question: string;
+    answer: string;
+    cited_chunks: { id: number; page_number: number; content: string; content_preview: string }[];
+    created_at: string;
+  }[];
 };
 
 export type Citation = {

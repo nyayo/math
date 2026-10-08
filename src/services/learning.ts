@@ -8,6 +8,11 @@ import { get, post } from '@/lib/api';
 const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true';
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+// DRF pagination wraps lists as { count, next, previous, results }.
+// This accepts either a plain array or a paginated object.
+function unwrapList<T = any>(data: any): T[] {
+  return Array.isArray(data) ? data : data?.results ?? [];
+}
 
 const subjectStyle: Record<string, { icon: string; color: string }> = {
   algebra: { icon: 'Sigma', color: 'brand' },
@@ -81,7 +86,12 @@ export async function getLessonsByTopic(topicId: string): Promise<Lesson[]> {
     await delay(300);
     return mockLessons.filter((l) => l.topic_id === topicId).sort((a, b) => a.order - b.order);
   }
-  return get(`/api/learning/topics/${topicId}/lessons/`);
+  const data = await get<any>(`/api/learning/topics/${topicId}/lessons/`);
+  return unwrapList(data).map((l) => ({
+    ...l,
+    id: String(l.id),
+    topic_id: String(l.topic ?? topicId),
+  })) as Lesson[];
 }
 
 export async function getLesson(id: string): Promise<Lesson> {
@@ -99,7 +109,16 @@ export async function getQuizzesByLesson(lessonId: string): Promise<Quiz[]> {
     await delay(300);
     return mockQuizzes.filter((q) => q.lesson_id === lessonId);
   }
-  return get(`/api/learning/lessons/${lessonId}/quizzes/`);
+  const data = await get<any>(`/api/learning/lessons/${lessonId}/quizzes/`);
+  return unwrapList(data).map((q) => ({
+    id: String(q.id),
+    lesson_id: String(q.lesson ?? lessonId),
+    title: q.title ?? '',
+    description: q.description ?? '',
+    questions_count: q.questions_count ?? 0,
+    best_score: q.best_score ?? null,
+    attempted: q.attempted ?? false,
+  }));
 }
 
 export async function getQuiz(id: string): Promise<Quiz> {
@@ -117,7 +136,17 @@ export async function getQuestions(quizId: string): Promise<Question[]> {
     await delay(400);
     return mockQuestions.filter((q) => q.quiz_id === quizId).sort((a, b) => a.order - b.order);
   }
-  return get(`/api/learning/quizzes/${quizId}/questions/`);
+  const data = await get<any>(`/api/learning/quizzes/${quizId}/questions/`);
+  return unwrapList(data).map((q, i) => ({
+    id: String(q.id),
+    quiz_id: String(q.quiz ?? quizId),
+    text: q.question_text ?? '',
+    type: Array.isArray(q.choices) && q.choices.length > 0 ? 'multiple_choice' : 'short_answer',
+    choices: q.choices ?? undefined,
+    correct_answer: q.correct_answer ?? '',   // students don't receive this from the API
+    explanation: q.explanation ?? '',
+    order: q.order ?? i,
+  }));
 }
 
 export async function submitAttempt(quizId: string, answers: Record<string, string>): Promise<Attempt> {

@@ -21,7 +21,7 @@ export default function TopicDetail() {
   const topicQuery = useTopic(topicId);
   const lessonsQuery = useLessons(topicId);
   const topic = topicQuery.data;
-  const lessons = lessonsQuery.data ?? [];
+  const lessons = Array.isArray(lessonsQuery.data) ? lessonsQuery.data : [];;
 
   if (topicQuery.isLoading) return <AppShell><div className="mt-6"><LoadingSkeleton variant="hero" /></div><div className="mt-6"><TopicsGridSkeleton /></div></AppShell>;
   if (topicQuery.isError || !topic) return <AppShell><ErrorState onRetry={() => void topicQuery.refetch()} message="We couldn't load this topic." /></AppShell>;

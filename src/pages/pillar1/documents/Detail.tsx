@@ -93,15 +93,23 @@ export default function DocumentDetail() {
     if (USE_MOCKS || !id) { setMode('ask'); return; }
     setLoadingSession(true);
     try {
-      const detail = await fetchDocumentSession(id, sid);
+            const detail = await fetchDocumentSession(id, sid);
       setSessionId(sid);
       setMessages(
-        (detail.messages || []).map((m) => ({
-          id: String(m.id),
-          role: m.role,
-          content: m.content,
-          citations: m.citations ?? undefined,
-        })),
+        ((detail.messages || []) as any[]).flatMap((m) => [
+          { id: `q-${m.id}`, role: 'user' as const, content: m.question ?? '' },
+          {
+            id: `a-${m.id}`,
+            role: 'assistant' as const,
+            content: m.answer ?? '',
+            citations: (m.cited_chunks ?? []).map((c: any) => ({
+              chunk_id: String(c.id),
+              page_number: c.page_number,
+              snippet: c.content_preview ?? c.content ?? '',
+              score: 0,
+            })),
+          },
+        ]),
       );
       setMode('ask');
     } catch (err) {

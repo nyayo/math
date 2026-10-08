@@ -6,7 +6,10 @@ import { cn } from '@/lib/utils';
 
 export function MarkdownRenderer({ content, className }: { content: string; className?: string }) {
   const [copied, setCopied] = React.useState<string | null>(null);
-  const html = React.useMemo(() => DOMPurify.sanitize(marked.parse(content, { async: false }) as string), [content]);
+  const html = React.useMemo(
+  () => DOMPurify.sanitize(marked.parse(content ?? '', { async: false }) as string),
+  [content]
+);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const copyCode = async (code: string, id: string) => { await navigator.clipboard.writeText(code); setCopied(id); window.setTimeout(() => setCopied(null), 1600); };
   React.useEffect(() => {

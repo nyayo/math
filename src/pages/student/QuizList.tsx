@@ -15,7 +15,7 @@ export default function QuizList() {
   const navigate = useNavigate();
   const quizzesQuery = useQuizzes(lessonId);
   const lessonQuery = useLesson(lessonId);
-  const quizzes = quizzesQuery.data ?? [];
+  const quizzes = Array.isArray(quizzesQuery.data) ? quizzesQuery.data : [];
 
   return (
     <AppShell>
